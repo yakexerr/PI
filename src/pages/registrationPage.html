@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Просмотр</title>
+    <link rel="stylesheet" href="/src/styles/styles.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <ul class="nav-links">
+                <li><a href="unautirizPage.html">Главная</a></li>
+                
+                <li class="auth-link"><a href="registrationPage.html">Регистрация</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="center-container">
+        <div class="auth-card">
+            <h1>Регистрация</h1>
+            <form>
+                <div class="input-group">
+                    <label for="name">Имя</label>
+                    <input type="text" id="name" placeholder="Введите имя">
+                    
+                </div>
+                <div class="input-group">
+                    <label for="lastname">Фамилия</label>
+                    <input type="text" id="login" placeholder="Введите фамилию">
+                    
+                </div>
+                <div class="input-group">
+                    <label for="date">Дата рождения</label>
+                    <input type="date" id="login" placeholder="Введите дату рождения">
+                    
+                </div>
+
+
+                <div class="input-group">
+                    <label for="login">Логин</label>
+                    <input type="text" id="login" placeholder="Введите логин (почта)">
+                    
+                </div>
+                <div class="input-group">
+                    <label for="password">Пароль</label>
+                    <input type="password" id="password" placeholder="Введите пароль">
+                </div>
+                <div class="input-group">
+                    <label for="password_2">Повторите пароль</label>
+                    <input type="password" id="password_2" placeholder="Введите пароль повторно">
+                    <span id="error-message" style="color: red;"></span>
+                </div>
+                <button type="submit" class="btn-submit">Зарегистрироваться</button>
+                <p class="form-footer">Уже есть аккаунт? <a href="authPage.html">Войти</a></p>
+            </form>
+        </div>
+        <span id="message" style="color: green;"></span>
+    </main>
+</body>
+</html>
