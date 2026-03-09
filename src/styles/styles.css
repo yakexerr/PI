@@ -1,0 +1,126 @@
+/* НАВИГАЦИЯ */
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgb(255, 123, 0); 
+    padding: 10px 20px; 
+    color: white;
+}
+
+.navbar .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.nav-links a {
+    text-decoration: none;
+    font-weight: 500;
+    padding: 5px 15px;
+    transition: color 0.3s ease;
+    color: white;
+}
+
+.nav-links li.auth-link {
+    margin-left: auto;
+}
+
+.nav-links a:hover {
+    color: #757575;
+}
+
+.nav-links a.active {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 50px;
+}
+
+.nav-buttons {
+    border: 1px solid rgb(93, 144, 211);
+}
+
+/* ЗАГОЛОВКИ */
+h1 {
+    text-align: center;
+}
+
+.reg-form{
+    border: #757575;
+}
+
+/* АУТЕНТИФИКАЦИЯ / РЕГИСТРАЦИЯ */
+.center-container{
+    display: flex;
+    justify-content: center; /* это чтоб по горизонтали центр*/
+    align-items: center;
+    min-height: calc(100vh - 70px); /* высота экрана минус шапка*/
+    background-color: #f4f7f6;
+}
+
+.auth-card{
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 450px;
+    text-align: center;
+}
+
+.auth-card h1{
+    margin-bottom: 20px;
+    color: #333;
+}
+
+
+.input-group{
+    text-align: left;
+    margin-bottom: 15px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    box-sizing: border-box; /* чтоб паддинг не вылезал за границы */
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 12px;
+    background-color: rgb(255, 123, 0); 
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-submit:hover {
+    background-color: rgb(220, 100, 0);
+}
+
+.form-footer {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #777;
+}
