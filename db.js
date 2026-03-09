@@ -34,5 +34,15 @@ export const dbActions = {
     getUsers: () => {
         const rows = db.prepare('SELECT * FROM users ORDER BY id DESC').all();
         return rows;
-    }
+    },
+
+    findUser: (username, password) => {
+        const isFind = db.prepare('SELECT * FROM users WHERE username = ? AND password = ?');
+        return isFind.get(username, password)
+    },
+
+    getUserData: (username) => {
+    const stmt = db.prepare('SELECT name, lastname, birthDate FROM users WHERE username = ?');
+    return stmt.get(username);
+}
 }

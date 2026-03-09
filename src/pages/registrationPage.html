@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Просмотр</title>
-    <link rel="stylesheet" href="/src/styles/styles.css">
+    <link rel="stylesheet" href="/styles/styles.css">
 </head>
 <body>
     <header>
@@ -19,7 +19,7 @@
     <main class="center-container">
         <div class="auth-card">
             <h1>Регистрация</h1>
-            <form>
+            <form id = "regForm">
                 <div class="input-group">
                     <label for="name">Имя</label>
                     <input type="text" id="name" placeholder="Введите имя">
@@ -27,19 +27,19 @@
                 </div>
                 <div class="input-group">
                     <label for="lastname">Фамилия</label>
-                    <input type="text" id="login" placeholder="Введите фамилию">
+                    <input type="text" id="lastname" placeholder="Введите фамилию">
                     
                 </div>
                 <div class="input-group">
                     <label for="date">Дата рождения</label>
-                    <input type="date" id="login" placeholder="Введите дату рождения">
+                    <input type="date" id="birthDate" placeholder="Введите дату рождения">
                     
                 </div>
 
 
                 <div class="input-group">
                     <label for="login">Логин</label>
-                    <input type="text" id="login" placeholder="Введите логин (почта)">
+                    <input type="text" id="username" placeholder="Введите логин (почта)">
                     
                 </div>
                 <div class="input-group">
@@ -52,10 +52,14 @@
                     <span id="error-message" style="color: red;"></span>
                 </div>
                 <button type="submit" class="btn-submit">Зарегистрироваться</button>
+
+                <div id="message" style="margin-top: 10px; font-weight: bold;"></div>
+
                 <p class="form-footer">Уже есть аккаунт? <a href="authPage.html">Войти</a></p>
             </form>
         </div>
         <span id="message" style="color: green;"></span>
     </main>
+    <script src="/scripts/registration.js"></script>
 </body>
 </html>
