@@ -1,0 +1,6 @@
+# Библиотеки
+node_modules/
+
+# База данных
+users.db
+.DS_Store

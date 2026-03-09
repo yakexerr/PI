@@ -1,40 +1,64 @@
-import { error } from "node:console";
-
 document.getElementById('regForm').addEventListener('submit', function(e) {
-    e.preventDefault(); // Останавливаем перезагрузку
+    e.preventDefault(); 
 
+    // собираем данные один раз в переменные
+    const username = document.getElementById('username').value;
     const p1 = document.getElementById('password').value;
     const p2 = document.getElementById('password_2').value;
-    const username = document.getElementById('username').value;
+    const name = document.getElementById('name').value;
+    const lastname = document.getElementById('lastname').value;
+    const birthDate = document.getElementById('birthDate').value;
 
     const errorSpan = document.getElementById('error-message');
-    // проверка на совпадение
+    const messageSpan = document.getElementById('message');
+
+    // очищаем старые сообщения
+    errorSpan.textContent = "";
+    messageSpan.textContent = "";
+
+    // проверка на совпадение паролей
     if (p1 !== p2) {
         errorSpan.textContent = "Пароли не совпадают!";
         return; 
-    } else {
-        errorSpan.textContent = "";
     }
 
-    //если пароли совпали, то создаем объект.
+    // создаем объект
     const user = {
         username: username,
-        password: p1
+        password: p1,
+        name: name,
+        lastname: lastname,
+        birthDate: birthDate
     };
 
     // отправка данных
-    const span = document.getElementById('message');
     fetch('/register', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(user)
     })
-    .then(response => {
+    .then(async response => {
         if (response.ok) {
-            span.textContent = "Регистрация успешна!"
+            const data = await response.json();
+            localStorage.setItem('userName', data.userName); // Для приветствия 
+            localStorage.setItem('userLogin', username);     // Сохраняем логин для запросов в БД
+            // Сохраняем имя (в сервере мы его назвали userName)
+            localStorage.setItem('userName', data.userName); 
+            
+            messageSpan.style.color = "green";
+            messageSpan.textContent = "Регистрация успешна! Переходим...";
+            
+            // Перенаправляем в папку pages
+            setTimeout(() => {
+                window.location.href = '/pages/homePage.html';
+            }, 1500); // Небольшая задержка, чтобы юзер успел увидеть радостный текст
         } else {
-            span.textContent = "Ошибка сервера"
+            messageSpan.style.color = "red";
+            messageSpan.textContent = data.error || "Ошибка регистрации";
         }
     })
-    .catch(error => console.error('Ошибка:', error));
+    .catch(err => {
+        console.error('Ошибка сети или сервера:', err);
+        messageSpan.textContent = "Не удалось связаться с сервером";
+    });
 });
