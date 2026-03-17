@@ -2,6 +2,7 @@ import Database from "better-sqlite3";
 
 const db = new Database('users.db')
 
+db.exec("PRAGMA foreign_keys = ON;"); // на всякий случай, чтобы внешние ключи тоже были включены
 db.exec(`
     CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -13,6 +14,60 @@ db.exec(`
     )
     `);
 
+
+// Таблица проектов
+db.exec(`
+CREATE TABLE IF NOT EXISTS projects (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    description TEXT,
+    manager_id INTEGER,
+    status TEXT DEFAULT 'PLANNING', -- PLANNING, ACTIVE, COMPLETED, CANCELLED
+    startDate DATE,
+    endDate DATE,
+    FOREIGN KEY (manager_id) REFERENCES users (id)
+)
+`);
+
+// Таблица задач
+/*
+type содержит BUG, FEATURE, IMPROVEMENT
+priority содержит LOW, MEDIUM, HIGH, CRITICAL - нет enum, обходимся текстом
+status содержит TODO, IN_PROGRESS, TESTING, DONE
+assignee_id содержит исполнителя
+reporter_id содержит того, кто создал задачу
+*/
+db.exec(`
+CREATE TABLE IF NOT EXISTS tasks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    project_id INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT,
+    type TEXT DEFAULT 'TASK',
+    priority TEXT DEFAULT 'MEDIUM',
+    status TEXT DEFAULT 'TODO',
+    assignee_id INTEGER,
+    reporter_id INTEGER,
+    due_date DATE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (project_id) REFERENCES projects (id),
+    FOREIGN KEY (assignee_id) REFERENCES users (id),
+    FOREIGN KEY (reporter_id) REFERENCES users (id)
+)
+`);
+
+// Таблица комментариев
+db.exec(`
+CREATE TABLE IF NOT EXISTS comments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    task_id INTEGER NOT NULL,
+    author_id INTEGER NOT NULL,
+    content TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (task_id) REFERENCES tasks (id),
+    FOREIGN KEY (author_id) REFERENCES users (id)
+)
+`);
 
 // это объект-синглтон - по сути готовый экземпляр с методами (похоже на статический класс)
 export const dbActions = {
