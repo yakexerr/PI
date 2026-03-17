@@ -18,9 +18,12 @@ app.post('/register', (req, res) => {
     try {
         const user = req.body;
 
-        // тут можно проверять занят ли юзернейм
-        // const existing = dbActions.getUserByName(user.username)
-        //типа такого
+        // проверяем занят ли юзернейм
+        const existingUser = dbActions.getUserByName(user.username)
+        if (existingUser) {
+            // код ошибки 409 - конфликт запроса с текущим состоянием сервера(т.е. запрос корректен, но нарушает целостность данных)
+            return res.status(409).json({ error: 'Пользователь с таким именем уже существует!' });
+        }
 
         dbActions.saveUser(user);
         res.status(201).json({ message: 'Успех', userName: user.name });

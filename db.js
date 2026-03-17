@@ -96,6 +96,11 @@ export const dbActions = {
         return isFind.get(username, password)
     },
 
+    getUserByName: (username) => { // проверка существующих имен пользователей
+        const stmt = db.prepare('SELECT * FROM users WHERE username = ?');
+        return stmt.get(username);
+    },
+
     getUserData: (username) => {
     const stmt = db.prepare('SELECT name, lastname, birthDate FROM users WHERE username = ?');
     return stmt.get(username);
