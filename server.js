@@ -1,5 +1,5 @@
 import express from 'express';
-import { dbActions } from './db.js';
+import {db, dbActions } from './db.js';
 import path from 'path';
 
 const app = express();
@@ -49,18 +49,42 @@ app.post('/login', (req, res) => {
 });
 
 
+
+
+// --- ПРОФИЛЬ ---
+app.get('/api/user-info', (req, res) => {
+    const username = req.query.username;
+    const user = dbActions.getUserData(username);
+    if (user) res.json(user);
+    else res.status(404).json({ error: 'Пользователь не найден' });
+});
+
+// --- ЗАДАЧИ ---
+// Отдать список задач
+app.get('/api/tasks', (req, res) => {
+    try {
+        const rows = db.prepare("SELECT * FROM tasks ORDER BY id DESC").all();
+        res.json(rows);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Принять новую задачу
+app.post('/api/tasks', (req, res) => {
+    try {
+        const { title, project_id } = req.body;
+        const pId = project_id || 1; 
+        const stmt = db.prepare("INSERT INTO tasks (title, project_id, status) VALUES (?, ?, 'TODO')");
+        const info = stmt.run(title, pId);
+        res.json({ id: info.lastInsertRowid, title, status: 'TODO' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
+// ВСЕГДА ДОЛЖЕН БЫЬ ВНИЗУ
 app.listen(PORT, () => {
     console.log(`Сервер запущен: http://localhost:${PORT}`);
 })
-
-// ПРОФИЛЬ
-app.get('/api/user-info', (req, res) => {
-    const username = req.query.username; // Получаем логин из параметров ссылки
-    const user = dbActions.getUserData(username);
-
-    if (user) {
-        res.json(user);
-    } else {
-        res.status(404).json({ error: 'Пользователь не найден' });
-    }
-});

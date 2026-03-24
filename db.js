@@ -1,6 +1,5 @@
 import Database from "better-sqlite3";
-
-const db = new Database('users.db')
+export const db = new Database('users.db')
 
 db.exec("PRAGMA foreign_keys = ON;"); // на всякий случай, чтобы внешние ключи тоже были включены
 db.exec(`
@@ -104,5 +103,9 @@ export const dbActions = {
     getUserData: (username) => {
     const stmt = db.prepare('SELECT name, lastname, birthDate FROM users WHERE username = ?');
     return stmt.get(username);
+    }
 }
-}
+
+// тестовый проект
+// TODO: удалить потом
+db.exec("INSERT OR IGNORE INTO projects (id, name) VALUES (1, 'Мой первый проект')");
