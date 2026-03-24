@@ -73,11 +73,46 @@ app.get('/api/tasks', (req, res) => {
 // Принять новую задачу
 app.post('/api/tasks', (req, res) => {
     try {
-        const { title, project_id } = req.body;
+        const { title, project_id, priority } = req.body;
         const pId = project_id || 1; 
-        const stmt = db.prepare("INSERT INTO tasks (title, project_id, status) VALUES (?, ?, 'TODO')");
-        const info = stmt.run(title, pId);
-        res.json({ id: info.lastInsertRowid, title, status: 'TODO' });
+        const stmt = db.prepare("INSERT INTO tasks (title, project_id, status, priority) VALUES (?, ?, 'TODO', ?)");
+        const info = stmt.run(title, pId, priority);
+        res.json({ id: info.lastInsertRowid, title, status: 'TODO', priority });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Обновить статус задачи
+app.put('/api/tasks/:id/status', (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+        const stmt = db.prepare("UPDATE tasks SET status = ? WHERE id = ?");
+        const info = stmt.run(status, id);
+
+        if (info.changes > 0) {
+            res.json({ message: 'Статус задачи обновлен' });
+        } else {
+            res.status(404).json({ error: 'Задача не найдена' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Удалить задачу
+app.delete('/api/tasks/:id', (req, res) => {
+    try {
+        const { id } = req.params;
+        const stmt = db.prepare("DELETE FROM tasks WHERE id = ?");
+        const info = stmt.run(id);
+
+        if (info.changes > 0) {
+            res.json({ message: 'Задача удалена' });
+        } else {
+            res.status(404).json({ error: 'Задача не найдена' });
+        }
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
