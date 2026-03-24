@@ -53,6 +53,7 @@ document.getElementById('regForm').addEventListener('submit', function(e) {
                 window.location.href = '/pages/homePage.html';
             }, 1500); // Небольшая задержка, чтобы юзер успел увидеть радостный текст
         } else {
+            const data = await response.json(); // чтение ответа от сервера при ошибке
             messageSpan.style.color = "red";
             messageSpan.textContent = data.error || "Ошибка регистрации";
         }
