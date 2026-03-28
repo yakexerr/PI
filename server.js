@@ -119,6 +119,25 @@ app.delete('/api/tasks/:id', (req, res) => {
 });
 
 
+// Обновить статус задачи
+app.patch('/api/tasks/:id', (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body; // Получаем новый статус из запроса
+        
+        const stmt = db.prepare("UPDATE tasks SET status = ? WHERE id = ?");
+        const info = stmt.run(status, id);
+
+        if (info.changes > 0) {
+            res.json({ message: 'Статус обновлен', id, status });
+        } else {
+            res.status(404).json({ error: 'Задача не найдена' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // ВСЕГДА ДОЛЖЕН БЫЬ ВНИЗУ
 app.listen(PORT, () => {
     console.log(`Сервер запущен: http://localhost:${PORT}`);
