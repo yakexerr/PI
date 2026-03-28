@@ -9,7 +9,7 @@
             <nav class="navbar">
                 <ul class="nav-links">
                     <li><a href="homePage.html">Главная</a></li>
-                    <li><a href="tasksPage.html">Задачи</a></li>
+                    <li><a href="tasksPage.html" class="active">Задачи</a></li>
                     <li class="auth-link"><a href="profilePage.html">Профиль</a></li>
                 </ul>
             </nav>
@@ -17,14 +17,38 @@
         <main>
             <h1>Задачи</h1>
             <form id="taskForm"> 
-                <input type="text" id="taskTitle" placeholder="Название задачи" required>
-                <button type="submit" id="addTask">Добавить задачу</button>
+                <div id="taskNameInput">
+                    <input type="text" id="taskTitle" placeholder="Название задачи" required>
+                    <select id="taskPriority">
+                        <option value="Высокий">Высокий</option>
+                        <option value="Средний" selected>Средний</option>
+                        <option value="Низкий">Низкий</option>
+                    </select>
+                    <button type="submit" id="addTaskButton">Добавить задачу</button>
+                </div> 
             </form>
             
             <!-- место для сообщений об ошибках/успехе -->
             <span id="message"></span>
+
+            <div class="kanban-board">
+                <div class="kanban-column" id="col-todo">
+                    <h2>Нужно сделать</h2>
+                    <ul class="task-list"></ul>
+                </div>
+                <div class="kanban-column" id="col-progress">
+                    <h2>В работе</h2>
+                    <ul class="task-list"></ul>
+                </div>
+                <div class="kanban-column" id="col-done">
+                    <h2>Готово</h2>
+                    <ul class="task-list"></ul>
+                </div>
+            </div>
+
             
-            <ul id="taskList"></ul>
+            
+            <!-- <ul id="taskList"></ul> -->
         </main>
         <script src="../scripts/tasks.js"></script>
     </body>

@@ -21,8 +21,7 @@
     list-style: none;
     margin: 0;
     padding: 0;
-    align-items: center;
-    flex-grow: 1;
+    gap: 1.5rem;
 }
 
 .nav-links a {
@@ -44,6 +43,7 @@
 .nav-links a.active {
     background-color: rgba(255, 255, 255, 0.2);
     border-radius: 50px;
+    padding: 5px 15px;
 }
 
 .nav-buttons {
@@ -136,3 +136,137 @@ img{
   margin-left: auto;
   margin-right: auto;
 }
+
+/*ЗАДАЧИ*/
+#taskTitle{
+    width: 100%; 
+    padding: 8px; 
+    margin-bottom: 15px;
+}
+
+#taskNameInput{
+    margin: 20px auto; 
+    width: 300px; 
+    text-align: left;
+}
+
+#addTaskButton{
+    width: 320px;
+    padding: 12px;
+    background-color: rgb(255, 123, 0);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+#addTaskButton:hover {
+    background-color: rgb(255, 156, 63);
+}
+
+#addTaskButton:active {
+    background-color: rgb(250, 187, 127);
+    /* border-radius: 50px; */
+    padding: 5px 15px;
+}
+
+#taskPriority{
+    width: 200px;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-bottom: 10px; 
+    transition: background 0.3s;
+    padding-left: 10px;
+    margin-left: 60px;
+}
+
+
+/* Контейнер формы */
+.task-form-container {
+    display: flex;
+    flex-direction: column; /* Элементы друг под другом */
+    align-items: center;    /* Центровка по горизонтали */
+    gap: 10px;             /* Отступы между полями */
+    max-width: 400px;       /* Максимальная ширина формы */
+    margin: 20px auto;      /* Центрирует саму форму на странице */
+}
+
+/* Обнуляем твои старые отступы и фиксированную ширину */
+#taskTitle, #taskPriority, #addTaskButton {
+    width: 100%;           /* Занимают всю ширину контейнера (400px) */
+    margin: 0;             /* Убираем лишние отступы */
+    box-sizing: border-box;
+}
+
+/* Стили для Канбан-доски */
+.kanban-board {
+    display: flex;
+    justify-content: center; /* Центрирует колонки */
+    gap: 20px;
+    padding: 20px;
+    align-items: flex-start;
+}
+
+.kanban-column {
+    background-color: #ebedf0;
+    border-radius: 8px;
+    width: 300px;
+    min-height: 200px;
+    padding: 10px;
+}
+
+.kanban-column h2 {
+    font-size: 1.2rem;
+    text-align: center;
+    color: #333;
+}
+
+.task-list {
+    list-style: none;
+    padding: 0;
+}
+
+/* Стиль карточки задачи */
+.task-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 10px;
+    background: white;
+    margin-bottom: 12px;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.task-actions {
+    display: flex;
+    gap: 5px;
+    border-top: 1px solid #eee;
+    padding-top: 10px;
+}
+
+.task-actions button {
+    flex: 1;
+    font-size: 12px;
+    padding: 5px;
+    cursor: pointer;
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: 0.2s;
+}
+
+.task-actions button:hover {
+    background: #e0e0e0;
+}
+
+/* Цвета по приоритету */
+.priority-Высокий { border-left-color: red; }
+.priority-Средний { border-left-color: orange; }
+.priority-Низкий { border-left-color: green; }
