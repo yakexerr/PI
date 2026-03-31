@@ -275,6 +275,7 @@ img{
     padding: 15px;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border-left: 5px solid;
 }
 
 .task-actions {
@@ -300,6 +301,6 @@ img{
 }
 
 /* Цвета по приоритету */
-.priority-Высокий { border-left-color: red; }
-.priority-Средний { border-left-color: orange; }
-.priority-Низкий { border-left-color: green; }
+.priority-Высокий { border-left-color: rgba(206, 0, 0, 0.67); }
+.priority-Средний { border-left-color: rgba(251, 180, 1, 0.67); }
+.priority-Низкий { border-left-color: rgba(24, 235, 24, 0.67); }

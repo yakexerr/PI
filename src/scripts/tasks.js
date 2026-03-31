@@ -15,6 +15,22 @@ async function updateTaskStatus(taskId, newStatus) {
     }
 }
 
+async function updateTaskPriority(taskId, priority) {
+    try {
+        const response = await fetch(`/api/tasks/${taskId}/priority`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ priority: priority })
+        });
+
+        if (response.ok) {
+            loadTasks();
+        }
+    } catch (err) {
+        console.error("Ошибка при смене приоритета:", err);
+    }
+}
+
 async function loadTasks() {
     try {
         const res = await fetch('/api/tasks');
@@ -50,10 +66,17 @@ async function loadTasks() {
                     buttonsHtml = `<button onclick="updateTaskStatus(${t.id}, 'IN_PROGRESS')">Вернуть в работу</button>`;
                 }
 
+                const priorities = ['Высокий', 'Средний', 'Низкий'];
+                const priorityDropdown = `
+                    <select onchange="updateTaskPriority(${t.id}, this.value)">
+                        ${priorities.map(p => `<option value="${p}" ${t.priority === p ? 'selected' : ''}>${p}</option>`).join('')}
+                    </select>
+                `;
+
                 li.innerHTML = `
                     <div class="task-content">
                         <strong>${t.title}</strong>
-                        <p>Приоритет: ${t.priority || 'Средний'}</p>
+                        <p>Приоритет: ${priorityDropdown}</p>
                     </div>
                     <div class="task-actions">
                         ${buttonsHtml}

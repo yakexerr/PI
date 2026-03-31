@@ -138,6 +138,25 @@ app.patch('/api/tasks/:id', (req, res) => {
     }
 });
 
+// Обновить приоритет задачи
+app.patch('/api/tasks/:id/priority', (req, res) => {
+    try {
+        const { id } = req.params;
+        const { priority } = req.body;
+        
+        const stmt = db.prepare("UPDATE tasks SET priority = ? WHERE id = ?");
+        const info = stmt.run(priority, id);
+
+        if (info.changes > 0) {
+            res.json({ message: 'Приоритет обновлен', id, priority });
+        } else {
+            res.status(404).json({ error: 'Задача не найдена' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // ВСЕГДА ДОЛЖЕН БЫЬ ВНИЗУ
 app.listen(PORT, () => {
     console.log(`Сервер запущен: http://localhost:${PORT}`);
