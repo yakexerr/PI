@@ -7,6 +7,7 @@
     background-color: rgb(255, 123, 0); 
     padding: 10px 20px; 
     color: white;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 .navbar .logo {
@@ -16,12 +17,15 @@
 
 
 
+
+
 .nav-links {
     display: flex;
     list-style: none;
     margin: 0;
     padding: 0;
     gap: 1.5rem;
+    width: 100%;
 }
 
 .nav-links a {
@@ -33,6 +37,7 @@
 }
 
 .nav-links li.auth-link {
+    /* display: flex; */
     margin-left: auto;
 }
 
@@ -138,6 +143,12 @@ img{
 }
 
 /*ЗАДАЧИ*/
+
+/*Это для слова "Задача" в верху страницы*/
+.task-h1{
+    font-family: Arial, Helvetica, sans-serif;
+}
+
 #taskTitle{
     width: 100%; 
     padding: 8px; 
@@ -185,6 +196,19 @@ img{
     margin-left: 60px;
 }
 
+/*Сообщение об успехе*/
+.msgdiv{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+
+#message{
+    font-weight: bold;
+}
+
 
 /* Контейнер формы */
 .task-form-container {
@@ -196,11 +220,14 @@ img{
     margin: 20px auto;      /* Центрирует саму форму на странице */
 }
 
-/* Обнуляем твои старые отступы и фиксированную ширину */
 #taskTitle, #taskPriority, #addTaskButton {
-    width: 100%;           /* Занимают всю ширину контейнера (400px) */
-    margin: 0;             /* Убираем лишние отступы */
+    width: 100%;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: 0;
+    margin-right: 0;
     box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 /* Стили для Канбан-доски */
@@ -218,10 +245,12 @@ img{
     width: 300px;
     min-height: 200px;
     padding: 10px;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 .kanban-column h2 {
-    font-size: 1.2rem;
+    font-family:Arial, Helvetica, sans-serif;
+    font-size: 1.4rem;
     text-align: center;
     color: #333;
 }
