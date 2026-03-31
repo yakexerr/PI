@@ -26,6 +26,7 @@ async function loadTasks() {
             'DONE': document.querySelector('#col-done .task-list')
         };
         
+        // очищаем список чтобы при отрисовывании задачи не дублировались (именно в list.innerHTML = "" - типа всё что внутри элемента очсищаем) 
         Object.values(lists).forEach(list => list.innerHTML = "");
 
         tasks.forEach(t => {
@@ -56,6 +57,7 @@ async function loadTasks() {
                     </div>
                     <div class="task-actions">
                         ${buttonsHtml}
+                        <button class="btn-delete" onclick="if(confirm('Удалить задачу?')) deleteTask(${t.id})">Удалить</button>
                     </div>
                 `;
                 targetList.appendChild(li);
