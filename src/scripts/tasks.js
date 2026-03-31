@@ -52,6 +52,7 @@ async function loadTasks() {
             if (targetList) {
                 const li = document.createElement('li');
                 li.className = `task-card priority-${t.priority}`;
+                li.dataset.taskId = t.id;
                 
                 // Генерируем кнопки в зависимости от статуса
                 let buttonsHtml = '';
@@ -141,4 +142,42 @@ document.getElementById('taskForm').addEventListener('submit', async function(e)
     } catch (err) {
         console.error('Ошибка сети:', err);
     }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const todoList = document.querySelector('#col-todo .task-list');
+    const progressList = document.querySelector('#col-progress .task-list');
+    const doneList = document.querySelector('#col-done .task-list');
+
+    const options = {
+        group: 'shared',
+        animation: 150,
+        onEnd: function (evt) {
+            const taskId = evt.item.dataset.taskId;
+            let newStatus;
+            
+            // Определяем новый статус по ID родительского элемента
+            const parentId = evt.to.parentElement.id;
+            switch (parentId) {
+                case 'col-todo':
+                    newStatus = 'TODO';
+                    break;
+                case 'col-progress':
+                    newStatus = 'IN_PROGRESS';
+                    break;
+                case 'col-done':
+                    newStatus = 'DONE';
+                    break;
+            }
+
+            if (newStatus) {
+                // Вызываем существующую функцию для обновления статуса
+                updateTaskStatus(taskId, newStatus);
+            }
+        }
+    };
+
+    new Sortable(todoList, options);
+    new Sortable(progressList, options);
+    new Sortable(doneList, options);
 });
