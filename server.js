@@ -63,7 +63,7 @@ app.get('/api/user-info', (req, res) => {
 // Отдать список задач
 app.get('/api/tasks', (req, res) => {
     try {
-        const rows = db.prepare("SELECT * FROM tasks ORDER BY id DESC").all();
+        const rows = db.prepare("SELECT * FROM tasks ORDER BY position, id DESC").all();
         res.json(rows);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -74,10 +74,35 @@ app.get('/api/tasks', (req, res) => {
 app.post('/api/tasks', (req, res) => {
     try {
         const { title, project_id, priority } = req.body;
-        const pId = project_id || 1; 
-        const stmt = db.prepare("INSERT INTO tasks (title, project_id, status, priority) VALUES (?, ?, 'TODO', ?)");
-        const info = stmt.run(title, pId, priority);
-        res.json({ id: info.lastInsertRowid, title, status: 'TODO', priority });
+        const pId = project_id || 1;
+
+        // Получаем максимальную позицию и ставим новую задачу в конец
+        const posStmt = db.prepare("SELECT MAX(position) as max_pos FROM tasks");
+        const maxPos = posStmt.get().max_pos || 0;
+        const newPos = maxPos + 1;
+
+        const stmt = db.prepare("INSERT INTO tasks (title, project_id, status, priority, position) VALUES (?, ?, 'TODO', ?, ?)");
+        const info = stmt.run(title, pId, priority, newPos);
+        res.json({ id: info.lastInsertRowid, title, status: 'TODO', priority, position: newPos });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Обновить порядок задач
+app.post('/api/tasks/order', (req, res) => {
+    try {
+        const { order } = req.body; // order - это массив ID в новом порядке
+        
+        const updateStmt = db.prepare("UPDATE tasks SET position = ? WHERE id = ?");
+
+        db.transaction(() => {
+            order.forEach((taskId, index) => {
+                updateStmt.run(index, taskId);
+            });
+        })();
+
+        res.json({ message: 'Порядок задач обновлен' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

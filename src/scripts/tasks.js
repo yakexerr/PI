@@ -154,25 +154,35 @@ document.addEventListener('DOMContentLoaded', () => {
         animation: 150,
         onEnd: function (evt) {
             const taskId = evt.item.dataset.taskId;
-            let newStatus;
             
-            // Определяем новый статус по ID родительского элемента
-            const parentId = evt.to.parentElement.id;
-            switch (parentId) {
-                case 'col-todo':
-                    newStatus = 'TODO';
-                    break;
-                case 'col-progress':
-                    newStatus = 'IN_PROGRESS';
-                    break;
-                case 'col-done':
-                    newStatus = 'DONE';
-                    break;
-            }
+            // если перемещение внутри одной колонки
+            if (evt.from === evt.to) {
+                const taskIds = Array.from(evt.to.children).map(item => item.dataset.taskId);
+                
+                fetch('/api/tasks/order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ order: taskIds })
+                }).catch(err => console.error("Ошибка при обновлении порядка:", err));
 
-            if (newStatus) {
-                // Вызываем существующую функцию для обновления статуса
-                updateTaskStatus(taskId, newStatus);
+            } else { // если задача перенесена в другую колонку
+                let newStatus;
+                const parentId = evt.to.parentElement.id;
+                switch (parentId) {
+                    case 'col-todo':
+                        newStatus = 'TODO';
+                        break;
+                    case 'col-progress':
+                        newStatus = 'IN_PROGRESS';
+                        break;
+                    case 'col-done':
+                        newStatus = 'DONE';
+                        break;
+                }
+
+                if (newStatus) {
+                    updateTaskStatus(taskId, newStatus);
+                }
             }
         }
     };

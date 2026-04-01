@@ -55,6 +55,15 @@ CREATE TABLE IF NOT EXISTS tasks (
 )
 `);
 
+const columns = db.prepare("PRAGMA table_info(tasks)").all();
+const positionColumn = columns.find(c => c.name === 'position');
+
+if (!positionColumn) {
+    db.exec("ALTER TABLE tasks ADD COLUMN position INTEGER");
+    db.exec("UPDATE tasks SET position = id");
+}
+
+
 // Таблица комментариев
 db.exec(`
 CREATE TABLE IF NOT EXISTS comments (
