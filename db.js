@@ -9,7 +9,8 @@ db.exec(`
     password TEXT NOT NULL,
     name TEXT NOT NULL,
     lastname TEXT NOT NULL,
-    birthDate DATE NOT NULL
+    birthDate DATE NOT NULL,
+    role TEXT DEFAULT 'DEVELOPER'
     )
     `);
 
@@ -110,7 +111,7 @@ export const dbActions = {
     },
 
     getUserData: (username) => {
-    const stmt = db.prepare('SELECT name, lastname, birthDate FROM users WHERE username = ?');
+    const stmt = db.prepare('SELECT name, lastname, birthDate, role FROM users WHERE username = ?');
     return stmt.get(username);
     }
 }

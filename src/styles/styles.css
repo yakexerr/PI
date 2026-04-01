@@ -145,6 +145,25 @@ img{
   margin-left: auto;
   margin-right: auto;
 }
+.center-content{
+    flex: content;
+    /* padding-top:; */
+}
+
+#logout-button{
+    flex: content;
+
+    width: 120px;
+    padding: 12px;
+    margin-top: auto;
+    background-color: rgb(255, 123, 0);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
 
 /*ЗАДАЧИ*/
 

@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('p-name').textContent = user.name;
                 document.getElementById('p-lastname').textContent = user.lastname;
                 document.getElementById('p-birthDate').textContent = user.birthDate;
+                document.getElementById('p-role').textContent = user.role;
             }
         })
         .catch(err => console.error("Ошибка:", err));
