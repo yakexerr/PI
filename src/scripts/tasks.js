@@ -39,6 +39,7 @@ async function loadTasks() {
         const lists = {
             'TODO': document.querySelector('#col-todo .task-list'),
             'IN_PROGRESS': document.querySelector('#col-progress .task-list'),
+            'TESTING': document.querySelector('#col-testing .task-list'),
             'DONE': document.querySelector('#col-done .task-list')
         };
         
@@ -61,6 +62,11 @@ async function loadTasks() {
                 } else if (status === 'IN_PROGRESS') {
                     buttonsHtml = `
                         <button onclick="updateTaskStatus(${t.id}, 'TODO')">Назад</button>
+                        <button onclick="updateTaskStatus(${t.id}, 'TESTING')">Тестировать</button>
+                    `;
+                } else if (status === 'TESTING') {
+                    buttonsHtml = `
+                        <button onclick="updateTaskStatus(${t.id}, 'IN_PROGRESS')">Назад</button>
                         <button onclick="updateTaskStatus(${t.id}, 'DONE')">Готово</button>
                     `;
                 } else if (status === 'DONE') {
@@ -87,6 +93,7 @@ async function loadTasks() {
                 targetList.appendChild(li);
             }
         });
+        initSortable();
     } catch (err) {
         console.error("Ошибка загрузки задач:", err);
     }
@@ -144,50 +151,37 @@ document.getElementById('taskForm').addEventListener('submit', async function(e)
     }
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-    const todoList = document.querySelector('#col-todo .task-list');
-    const progressList = document.querySelector('#col-progress .task-list');
-    const doneList = document.querySelector('#col-done .task-list');
 
-    const options = {
-        group: 'shared',
-        animation: 150,
-        onEnd: function (evt) {
-            const taskId = evt.item.dataset.taskId;
-            
-            // если перемещение внутри одной колонки
-            if (evt.from === evt.to) {
-                const taskIds = Array.from(evt.to.children).map(item => item.dataset.taskId);
+function initSortable() {
+    const lists = document.querySelectorAll('.task-list');
+    lists.forEach(list => {
+        new Sortable(list, {
+            group: 'shared',
+            animation: 150,
+            onEnd: function (evt) {
+                const taskId = evt.item.dataset.taskId;
                 
-                fetch('/api/tasks/order', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ order: taskIds })
-                }).catch(err => console.error("Ошибка при обновлении порядка:", err));
+                // Если перетащили В ДРУГУЮ колонку
+                if (evt.from !== evt.to) {
+                    const parentId = evt.to.parentElement.id;
+                    let newStatus = '';
+                    if (parentId === 'col-todo') newStatus = 'TODO';
+                    else if (parentId === 'col-progress') newStatus = 'IN_PROGRESS'; // Явно прописываем
+                    else if (parentId === 'col-testing') newStatus = 'TESTING';
+                    else if (parentId === 'col-done') newStatus = 'DONE';
 
-            } else { // если задача перенесена в другую колонку
-                let newStatus;
-                const parentId = evt.to.parentElement.id;
-                switch (parentId) {
-                    case 'col-todo':
-                        newStatus = 'TODO';
-                        break;
-                    case 'col-progress':
-                        newStatus = 'IN_PROGRESS';
-                        break;
-                    case 'col-done':
-                        newStatus = 'DONE';
-                        break;
-                }
-
-                if (newStatus) {
                     updateTaskStatus(taskId, newStatus);
+                } 
+                // Если перетащили ВНУТРИ одной колонки (сортировка)
+                else {
+                    const taskIds = Array.from(evt.to.children).map(item => item.dataset.taskId);
+                    fetch('/api/tasks/order', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ order: taskIds })
+                    }).catch(err => console.error("Ошибка при обновлении порядка:", err));
                 }
             }
-        }
-    };
-
-    new Sortable(todoList, options);
-    new Sortable(progressList, options);
-    new Sortable(doneList, options);
-});
+        });
+    });
+}

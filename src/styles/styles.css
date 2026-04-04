@@ -63,7 +63,7 @@
 }
 
 .logo img {
-    height: 30px;
+    height: 40px;
     width: auto;
 }
 
@@ -315,8 +315,11 @@ img{
 .task-list {
     list-style: none;
     padding: 0;
+    min-height: 100px; /* Даже если список пуст, он будет высотой 100px */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
-
 /* Стиль карточки задачи */
 .task-card {
     display: flex;

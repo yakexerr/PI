@@ -76,15 +76,18 @@ app.post('/api/tasks', (req, res) => {
         const { title, project_id, priority } = req.body;
         const pId = project_id || 1;
 
+        console.log("Пытаюсь создать задачу для проекта ID:", pId);
+
         // Получаем максимальную позицию и ставим новую задачу в конец
         const posStmt = db.prepare("SELECT MAX(position) as max_pos FROM tasks");
         const maxPos = posStmt.get().max_pos || 0;
         const newPos = maxPos + 1;
 
-        const stmt = db.prepare("INSERT INTO tasks (title, project_id, status, priority, position) VALUES (?, ?, 'TODO', ?, ?)");
-        const info = stmt.run(title, pId, priority, newPos);
+        const stmt = db.prepare("INSERT INTO tasks (title, project_id, status, priority, position) VALUES (?, ?, ?, ?, ?)");
+        const info = stmt.run(title, pId, 'TODO', priority, newPos);
         res.json({ id: info.lastInsertRowid, title, status: 'TODO', priority, position: newPos });
     } catch (err) {
+        console.error("SQL Error:", err.message);
         res.status(500).json({ error: err.message });
     }
 });

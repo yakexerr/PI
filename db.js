@@ -118,4 +118,5 @@ export const dbActions = {
 
 // тестовый проект
 // TODO: удалить потом
-// db.exec("INSERT OR IGNORE INTO projects (id, name) VALUES (1, 'Мой первый проект')");
+
+db.exec("INSERT OR IGNORE INTO projects (id, name) VALUES (1, 'Тестовый проект')");
