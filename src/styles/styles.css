@@ -1,22 +1,59 @@
 /* НАВИГАЦИЯ */
+
+/* НАВИГАЦИЯ */
 .navbar {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 5px 20px; 
+    align-items: stretch; /* Сделает так, чтобы элементы растянулись на все 48px */
+    padding: 0 20px;      /* Убираем вертикальный паддинг, оставляем только боковой */
     background-color: #fff;
     border-bottom: 1px solid #ddd;
     font-family: Arial, sans-serif;
     height: 48px;
 }
 
-/* убираем подчеркивание у ссылки-логотипа */
 .logo-link {
-    text-decoration: none;
-    color: inherit;
     display: flex;
-    align-items: center;
-    flex-shrink: 0; /* запрещает логотипу сжиматься */
+    align-items: center; /* Логотип центрируем отдельно */
+    text-decoration: none;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex-grow: 1; /* Чтобы список занял всё место */
+}
+
+/* Ссылки */
+.nav-links a {
+    display: flex;
+    align-items: center;   /* Центрируем текст внутри ссылки по вертикали */
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0 15px;       /* Паддинг только по бокам */
+    height: 100%;          /* Ссылка теперь высотой 48px */
+    color: #444;
+    transition: all 0.2s ease;
+    border-bottom: 2px solid transparent; /* Запас места для линии */
+}
+
+/* Общий стиль для ВСЕХ активных вкладок (включая профиль) */
+.nav-links a.active {
+    color: #0052cc !important;
+    border-bottom: 2px solid #0052cc !important;
+}
+
+.nav-links a:hover {
+    background-color: #f0f0f0;
+    color: #0052cc;
+}
+
+/* Профиль улетает вправо */
+.nav-links li.auth-link {
+    margin-left: auto;
+    display: flex; /* Чтобы li не схлопывался */
 }
 
 .logo {
@@ -38,44 +75,6 @@
     text-transform: lowercase; 
     margin-right: 10px;
 }
-
-.nav-links {
-    display: flex;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    gap: 0.5rem;
-    /* gap: 5px; */
-    width: 100%;
-    flex-grow: 1; 
-}
-
-.nav-links a {
-    text-decoration: none;
-    font-weight: 500;
-    padding: 8px 15px;
-    transition: all 0.2s ease;
-    color: #444;
-}
-
-
-.nav-links a:hover {
-    background-color: #f0f0f0;
-    border-radius: 4px;
-    color: #0052cc;
-}
-
-.nav-links a.active {
-    color: #0052cc;
-    border-bottom: 2px solid #0052cc;
-    border-radius: 0;
-}
-
-.nav-links li.auth-link {
-    /* display: flex; */
-    margin-left: auto;
-}
-
 
 
 .nav-buttons {
