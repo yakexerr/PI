@@ -1,39 +1,74 @@
 /* НАВИГАЦИЯ */
-
 .navbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: rgb(255, 123, 0); 
-    padding: 10px 20px; 
-    color: white;
-    font-family: Arial, Helvetica, sans-serif;
+    padding: 5px 20px; 
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+    font-family: Arial, sans-serif;
+    height: 48px;
 }
 
-.navbar .logo {
-    font-size: 1.5rem;
-    font-weight: bold;
+/* убираем подчеркивание у ссылки-логотипа */
+.logo-link {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0; /* запрещает логотипу сжиматься */
 }
 
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0px; /* отступ между картинкой и текстом */
+}
 
+.logo img {
+    height: 30px;
+    width: auto;
+}
 
-
+.logo span {
+    font-size: 1rem;
+    font-weight: 400; /* как у остальных ссылок */
+    color: #333;
+    white-space: nowrap; /* запрет переноса на 2 строки */
+    text-transform: lowercase; 
+    margin-right: 10px;
+}
 
 .nav-links {
     display: flex;
     list-style: none;
     margin: 0;
     padding: 0;
-    gap: 1.5rem;
+    gap: 0.5rem;
+    /* gap: 5px; */
     width: 100%;
+    flex-grow: 1; 
 }
 
 .nav-links a {
     text-decoration: none;
     font-weight: 500;
-    padding: 5px 15px;
-    transition: color 0.3s ease;
-    color: white;
+    padding: 8px 15px;
+    transition: all 0.2s ease;
+    color: #444;
+}
+
+
+.nav-links a:hover {
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    color: #0052cc;
+}
+
+.nav-links a.active {
+    color: #0052cc;
+    border-bottom: 2px solid #0052cc;
+    border-radius: 0;
 }
 
 .nav-links li.auth-link {
@@ -41,15 +76,7 @@
     margin-left: auto;
 }
 
-.nav-links a:hover {
-    color: #757575;
-}
 
-.nav-links a.active {
-    background-color: rgba(255, 255, 255, 0.2);
-    border-radius: 50px;
-    padding: 5px 15px;
-}
 
 .nav-buttons {
     border: 1px solid rgb(93, 144, 211);
@@ -111,7 +138,7 @@ h1 {
 .btn-submit {
     width: 100%;
     padding: 12px;
-    background-color: rgb(255, 123, 0); 
+    background-color: #0052cc; 
     color: white;
     border: none;
     border-radius: 6px;
@@ -121,7 +148,7 @@ h1 {
 }
 
 .btn-submit:hover {
-    background-color: rgb(220, 100, 0);
+    background-color: #0052cc;
 }
 
 .form-footer {
@@ -156,13 +183,17 @@ img{
     width: 120px;
     padding: 12px;
     margin-top: auto;
-    background-color: rgb(255, 123, 0);
+    background-color: #0052cc;
     color: white;
     border: none;
     border-radius: 6px;
     font-size: 16px;
     cursor: pointer;
     transition: background 0.3s;
+}
+
+#logout-button:hover {
+    background-color: #022d6d;
 }
 
 /*ЗАДАЧИ*/
@@ -187,7 +218,7 @@ img{
 #addTaskButton{
     width: 320px;
     padding: 12px;
-    background-color: rgb(255, 123, 0);
+    background-color: #0052cc;
     color: white;
     border: none;
     border-radius: 6px;
@@ -197,11 +228,11 @@ img{
 }
 
 #addTaskButton:hover {
-    background-color: rgb(255, 156, 63);
+    background-color: #022d6d;
 }
 
 #addTaskButton:active {
-    background-color: rgb(250, 187, 127);
+    background-color: #347be6;
     /* border-radius: 50px; */
     padding: 5px 15px;
 }
@@ -251,6 +282,10 @@ img{
     margin-right: 0;
     box-sizing: border-box;
     font-family: Arial, Helvetica, sans-serif;
+}
+
+#taskTitle:active{
+    border-color: #0052cc;
 }
 
 /* Стили для Канбан-доски */
