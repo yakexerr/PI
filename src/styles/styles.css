@@ -1,15 +1,25 @@
-/* НАВИГАЦИЯ */
+/* Основная часть (справа) */
+.main-content {
+    flex-grow: 1; /* Растягивается на всё оставшееся место */
+    display: flex;
+    flex-direction: column;
+    min-width: 0; /* Важно, чтобы контент не выталкивал сайдбар */
+}
+
+/* Контейнер всего приложения */
+.app-container {
+    display: flex;
+    min-height: 100vh;
+}
 
 /* НАВИГАЦИЯ */
+    /* APPBAR */
 .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: stretch; /* Сделает так, чтобы элементы растянулись на все 48px */
-    padding: 0 20px;      /* Убираем вертикальный паддинг, оставляем только боковой */
-    background-color: #fff;
+    height: 50px;
     border-bottom: 1px solid #ddd;
-    font-family: Arial, sans-serif;
-    height: 48px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
 }
 
 .logo-link {
@@ -19,6 +29,14 @@
 }
 
 .nav-links {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex-grow: 1; /* Чтобы список занял всё место */
+}
+
+.side-links {
     display: flex;
     list-style: none;
     margin: 0;
@@ -63,8 +81,9 @@
 }
 
 .logo img {
-    height: 40px;
+    height: 50px;
     width: auto;
+    margin-bottom: 20px;
 }
 
 .logo span {
@@ -73,13 +92,112 @@
     color: #333;
     white-space: nowrap; /* запрет переноса на 2 строки */
     text-transform: lowercase; 
-    margin-right: 10px;
+    margin-bottom: 20px;
+    margin-right: 130px;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 
 .nav-buttons {
     border: 1px solid rgb(93, 144, 211);
 }
+
+
+    /* SIDEBAR */
+/* Сайдбар (слева) */
+.sidebar {
+    width: 240px;
+    background-color: #f4f5f7;
+    border-right: 1px solid #ddd;
+    padding: 20px;
+    flex-shrink: 0;
+}
+
+#projectSelector {
+    width: 180px;
+    border: none;
+    margin-left: 10px;
+    background-color: #f4f5f7;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 500;
+    color: #444;
+    transition: all 0.2s ease;
+    font-size: 16px;
+}
+
+
+.side-links {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex-grow: 1; /* Чтобы список занял всё место */
+}
+
+.side-links a{
+    display: flex;
+    align-items: center;   /* Центрируем текст внутри ссылки по вертикали */
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0 15px;
+    height: 100%;
+    color: #444;
+    transition: all 0.2s ease;
+    margin-top: 10px; 
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.side-links a.active {
+    color: #0052cc !important;
+    border-bottom: 2px solid #0052cc !important;
+}
+
+.side-links a:hover {
+    background-color: #f0f0f0;
+    color: #0052cc;
+}
+
+.custom-dropdown {
+    position: relative;
+    margin: 20px 10px;
+    cursor: pointer;
+}
+
+.dropdown-trigger {
+    padding: 8px 12px;
+    background: #e2e4e8;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.dropdown-menu {
+    display: none; /* Скрыто по умолчанию */
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border-radius: 4px;
+    z-index: 100;
+}
+
+.dropdown-menu a {
+    display: block;
+    padding: 8px 12px;
+    text-decoration: none;
+    color: #333;
+}
+
+.dropdown-menu a:hover {
+    background: #ebedf0;
+}
+
+
 
 /* ЗАГОЛОВКИ */
 h1 {

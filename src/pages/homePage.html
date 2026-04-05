@@ -1,29 +1,46 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Просмотр</title>
-    <link rel="stylesheet" href="../styles/styles.css">
-</head>
-<body>
-    <header>
-            <nav class="navbar">
-                <a href="homePage.html" class="logo-link">
-                    <div class="logo">
-                        <img src="../assets/logotype.png" alt="logo">
-                        <span>task system</span>
-                    </div>
-                </a>
-                <ul class="nav-links">
-                    <!-- <li><a href="homePage.html" class="active">Главная</a></li> -->
-                    <li><a href="tasksPage.html">Задачи</a></li>
-                    <li class="auth-link"><a href="profilePage.html">Профиль</a></li>
-                </ul>
-            </nav>
-        </header>
+    <head>
+        <meta charset="UTF-8">
+        <title>Просмотр</title>
+        <link rel="stylesheet" href="../styles/styles.css">
+    </head>
+    <body>
+        <div class="app-container">
+            <aside class="sidebar">
+                <div class="logo">
+                    <img src="../assets/logotype.png" alt="logo">
+                    <span>Task system</span>
+                </div>
 
-    <main>
-        <h1>Главная</h1>
-    </main>
-</body>
+                <div class="custom-dropdown">
+                    <div class="dropdown-trigger" onclick="toggleDropdown()">
+                        <span>Проекты</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="dropdown-menu" id="projectMenu">
+                        <a href="tasksPage.html">Проект 1</a>
+                        <a href="tasksPage.html">Проект 2</a>
+                    </div>
+                </div>
+
+                <ul class="side-links">
+                    <li><a href="profilePage.html">Профиль</a></li>
+                </ul>
+            </aside>
+        
+            <div class="main-content">
+                <header class="navbar">
+                    <ul class="nav-links">
+                        <li><a href="tasksPage.html">Доска</a></li>
+                        <li><a href="backlogPage.html">Бэклог</a></li>
+                    </ul>
+                </header>
+                <main>
+                    <!-- Контент страницы -->
+                    <script src="/scripts/dropdown_menu.js"></script>
+                </main>
+            </div>
+        </div>
+    </body>
 </html>
