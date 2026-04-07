@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <title>Беклоги</title>
+        <link rel="stylesheet" href="../styles/styles.css">
+    </head>
+    <body>
+        <div class="app-container">
+            <aside class="sidebar">
+                <div class="logo">
+                    <img src="../assets/logotype.png" alt="logo">
+                    <span>Task system</span>
+                </div>
+
+                <div class="custom-dropdown">
+                    <div class="dropdown-trigger" onclick="toggleDropdown()">
+                        <span>Проекты</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="dropdown-menu" id="projectMenu">
+                        <a href="tasksPage.html">Проект 1</a>
+                        <a href="tasksPage.html">Проект 2</a>
+                    </div>
+                </div>
+
+                <ul class="side-links">
+                    <li><a href="profilePage.html">Профиль</a></li>
+                </ul>
+            </aside>
+            <div class="main-content">
+                <header class="navbar">
+                    <ul class="nav-links">
+                        <li><a href="tasksPage.html">Доска</a></li>
+                        <li><a href="backlogsPage.html">Бэклог</a></li>
+                    </ul>
+                </header>
+                <main>
+                    <h1 class="task-h1">Беклоги</h1>
+                    <form id="backlogForm">
+                        <div id="sprintStarter">
+                            <h2 class="sprint-h1">Спринты</h2>
+                            <input type="checkbox" id="backlogToStart">
+                        </div>
+                        <div id="backlogMaker">
+                            <h2 class="backlog-h1">Беклоги</h2>
+                            <input type="checkbox" id="backlogMaked">
+                            <button type="button" id="btn-create">+ Создать</button>
+                            
+
+                        </div>
+                        <div class="msgdiv">
+                            <span id="message"></span>
+                        </div>
+                    </form>
+
+                    <!-- Всплывающее диалоговое окно для создания беклога -->
+                    <dialog id="myDialog">
+                        <form id="backlogFormDialog">
+                            <p>Введите информацию о беклоге:</p>
+                            <input type="text" id="backlogNameInput" placeholder="Название" required>
+                            <input type="text" id="backlogDescriptInput" placeholder="Что нужно сделать?" required>
+                            
+                            <div class="taskPriorityDiv">
+                                <label for="taskPriority">Приоритет задачи</label>
+                                <select id="taskPriority">
+                                    <option value="Высокий">Высокий</option>
+                                    <option value="Средний" selected>Средний</option>
+                                    <option value="Низкий">Низкий</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <button type="submit">Создать</button>
+                                <button type="button" onclick="document.getElementById('myDialog').close()">Отмена</button>
+                            </div>
+                        </form>
+                    </dialog>
+                </main>
+            </div>
+        </div>
+        <script src="../scripts/backlog.js"></script>
+    </body>
+</html>

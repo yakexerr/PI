@@ -478,3 +478,46 @@ img{
 .priority-Высокий { border-left-color: rgba(206, 0, 0, 0.67); }
 .priority-Средний { border-left-color: rgba(251, 180, 1, 0.67); }
 .priority-Низкий { border-left-color: rgba(24, 235, 24, 0.67); }
+
+
+/* БЕКЛОГИ */
+#btn-create {
+    width: 100%;
+    padding: 12px;
+    /* background-color: #d8dadd;  */
+    color: rgb(161, 157, 157);
+    border: none;
+    border-radius: 3px;
+    font-size: 14px;
+    text-align: start;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+#backlogMaker {
+    margin: 10px 5px 10px 10px;
+    background-color: rgb(238, 238, 238);
+}
+
+.backlog-h1{
+    /* margin: 25px 15px 0px 20px; */
+    padding: 10px 0px 0px 40px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#backlogMaked{
+    margin: 10px 0px 10px 15px;
+}
+
+
+
+/* СПРИНТЫ */
+#sprintStarter {
+    margin: 10px 5px 10px 10px;
+    background-color: rgb(238, 238, 238);
+}
+
+.sprint-h1 {
+    padding: 10px 0px 0px 40px;
+    font-family: Arial, Helvetica, sans-serif;
+}
