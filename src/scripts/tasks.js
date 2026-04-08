@@ -47,6 +47,7 @@ async function loadTasks() {
         Object.values(lists).forEach(list => list.innerHTML = "");
 
         tasks.forEach(t => {
+            console.log("Загружаю задачу:", t);
             const status = t.status || 'TODO';
             const targetList = lists[status];
 

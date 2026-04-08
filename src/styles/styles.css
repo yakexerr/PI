@@ -166,11 +166,13 @@
 .dropdown-trigger {
     padding: 8px 12px;
     background: #e2e4e8;
+    background-color: #ddd;
     border-radius: 4px;
     display: flex;
     justify-content: space-between;
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 500;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 .dropdown-menu {
@@ -489,19 +491,21 @@ img{
     border: none;
     border-radius: 3px;
     font-size: 14px;
-    text-align: start;
+    text-align: center;
     cursor: pointer;
     transition: background 0.3s;
 }
 
 #backlogMaker {
     margin: 10px 5px 10px 10px;
+    padding: 1px 20px 10px 0px;
     background-color: rgb(238, 238, 238);
+    border-radius: 10px;
 }
 
 .backlog-h1{
     /* margin: 25px 15px 0px 20px; */
-    padding: 10px 0px 0px 40px;
+    padding: 0px 0px 0px 40px;
     font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -509,15 +513,44 @@ img{
     margin: 10px 0px 10px 15px;
 }
 
+.bl-createform-btn {
+    width: 49%;
+    padding: 12px;
+    /* background-color: #d8dadd;  */
+    color: rgb(90, 88, 88);
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.3s;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+
 
 
 /* СПРИНТЫ */
 #sprintStarter {
     margin: 10px 5px 10px 10px;
     background-color: rgb(238, 238, 238);
+    border-radius: 10px;
 }
 
 .sprint-h1 {
     padding: 10px 0px 0px 40px;
     font-family: Arial, Helvetica, sans-serif;
+}
+
+#btn-start {
+    width: 100%;
+    padding: 12px;
+    /* background-color: #d8dadd;  */
+    color: rgb(161, 157, 157);
+    border: none;
+    /* border-radius: 3px; */
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.3s;
 }

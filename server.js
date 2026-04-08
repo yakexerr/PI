@@ -61,7 +61,7 @@ app.get('/api/user-info', (req, res) => {
 
 // --- ЗАДАЧИ ---
 // Отдать список задач
-app.get('/api/tasks', (req, res) => {
+app.get('/api/backlogs', (req, res) => {
     try {
         const rows = db.prepare("SELECT * FROM tasks ORDER BY position, id DESC").all();
         res.json(rows);
@@ -71,7 +71,7 @@ app.get('/api/tasks', (req, res) => {
 });
 
 // Принять новую задачу
-app.post('/api/tasks', (req, res) => {
+app.post('/api/backlogs', (req, res) => {
     try {
         const { title, project_id, priority } = req.body;
         const pId = project_id || 1;
@@ -93,7 +93,7 @@ app.post('/api/tasks', (req, res) => {
 });
 
 // Обновить порядок задач
-app.post('/api/tasks/order', (req, res) => {
+app.post('/api/backlogs/order', (req, res) => {
     try {
         const { order } = req.body; // order - это массив ID в новом порядке
         
@@ -112,7 +112,7 @@ app.post('/api/tasks/order', (req, res) => {
 });
 
 // Обновить статус задачи
-app.put('/api/tasks/:id/status', (req, res) => {
+app.put('/api/backlogs/:id/status', (req, res) => {
     try {
         const { id } = req.params;
         const { status } = req.body;
@@ -130,7 +130,7 @@ app.put('/api/tasks/:id/status', (req, res) => {
 });
 
 // Удалить задачу
-app.delete('/api/tasks/:id', (req, res) => {
+app.delete('/api/backlogs/:id', (req, res) => {
     try {
         const { id } = req.params;
         const stmt = db.prepare("DELETE FROM tasks WHERE id = ?");
@@ -148,7 +148,7 @@ app.delete('/api/tasks/:id', (req, res) => {
 
 
 // Обновить статус задачи
-app.patch('/api/tasks/:id', (req, res) => {
+app.patch('/api/backlogs/:id', (req, res) => {
     try {
         const { id } = req.params;
         const { status } = req.body; // Получаем новый статус из запроса
@@ -167,7 +167,7 @@ app.patch('/api/tasks/:id', (req, res) => {
 });
 
 // Обновить приоритет задачи
-app.patch('/api/tasks/:id/priority', (req, res) => {
+app.patch('/api/backlogs/:id/priority', (req, res) => {
     try {
         const { id } = req.params;
         const { priority } = req.body;

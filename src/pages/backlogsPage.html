@@ -40,13 +40,16 @@
                     <form id="backlogForm">
                         <div id="sprintStarter">
                             <h2 class="sprint-h1">Спринты</h2>
-                            <input type="checkbox" id="backlogToStart">
+                            <!-- <input type="checkbox" id="backlogToStart"> -->
+                            <button type="button" id="btn-start">+ Создать</button>
                         </div>
                         <div id="backlogMaker">
                             <h2 class="backlog-h1">Беклоги</h2>
-                            <input type="checkbox" id="backlogMaked">
+                            <!-- <input type="checkbox" id="backlogMaked"> -->
                             <button type="button" id="btn-create">+ Создать</button>
-                            
+                            <div id="blShow">
+                                <ul class="bl-list"></ul>
+                            </div>
 
                         </div>
                         <div class="msgdiv">
@@ -71,8 +74,8 @@
                             </div>
                             
                             <div>
-                                <button type="submit">Создать</button>
-                                <button type="button" onclick="document.getElementById('myDialog').close()">Отмена</button>
+                                <button type="submit" class="bl-createform-btn">Создать</button>
+                                <button type="button" class="bl-createform-btn" onclick="document.getElementById('myDialog').close()">Отмена</button>
                             </div>
                         </form>
                     </dialog>
