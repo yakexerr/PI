@@ -56,6 +56,25 @@ CREATE TABLE IF NOT EXISTS tasks (
 )
 `);
 
+db.exec(`
+    CREATE TABLE IF NOT EXISTS sprints (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        status TEXT DEFAULT 'TODO',
+        project_id INTEGER NOT NULL,
+        FOREIGN KEY (project_id) REFERENCES projects (id)
+    )
+`);
+
+db.exec(`
+    CREATE TABLE IF NOT EXISTS sprint_tasks (
+        sprint_id INTEGER NOT NULL,
+        task_id INTEGER NOT NULL,
+        FOREIGN KEY (sprint_id) REFERENCES sprints (id),
+        FOREIGN KEY (task_id) REFERENCES tasks (id)
+    )
+`);
+
 const columns = db.prepare("PRAGMA table_info(tasks)").all();
 const positionColumn = columns.find(c => c.name === 'position');
 
@@ -113,7 +132,27 @@ export const dbActions = {
     getUserData: (username) => {
     const stmt = db.prepare('SELECT name, lastname, birthDate, role FROM users WHERE username = ?');
     return stmt.get(username);
-    }
+    },
+
+    // (TODO)(yakexerr): должен вернуть пустой список если нет активных задач, добавить на сервере проверку!
+    getTasksForActiveSprint: (projectId) => {
+        const stmt = db.prepare(`
+            SELECT t.* FROM tasks t
+            JOIN sprint_tasks st ON t.id = st.task_id
+            JOIN sprints s ON st.sprint_id = s.id
+            WHERE s.status = 'ACTIVE' AND s.project_id = ?
+        `);
+        // .all там где select, .run это insert, update, delete
+        return stmt.all(projectId); 
+
+    
+    },
+
+    // (TODO)(yakexerr): нужно ли сделать так чтобы отображались просто все задачи на доске если спринта нет? если да то вот:
+    getTasksByProject: (projectId) => {
+        const stmt = db.prepare('SELECT * FROM tasks WHERE project_id = ?');
+        return stmt.all(projectId);
+    },
 }
 
 // тестовый проект
