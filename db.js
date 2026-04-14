@@ -75,6 +75,13 @@ db.exec(`
     )
 `);
 
+const userCols = db.prepare("PRAGMA table_info(users)").all();
+const roleColumn = userCols.find(c => c.name === 'role');
+
+if (!roleColumn) {
+    db.exec("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'DEVELOPER'");
+}
+
 const columns = db.prepare("PRAGMA table_info(tasks)").all();
 const positionColumn = columns.find(c => c.name === 'position');
 
@@ -153,6 +160,71 @@ export const dbActions = {
         const stmt = db.prepare('SELECT * FROM tasks WHERE project_id = ?');
         return stmt.all(projectId);
     },
+
+    // Спринты
+    createSprint: (projectId, name) => {
+        const stmt = db.prepare("INSERT INTO sprints (project_id, name, status) VALUES (?, ?, 'TODO')");
+        return stmt.run(projectId, name);
+    },
+
+    getSprintsByProject: (projectId) => {
+        const stmt = db.prepare('SELECT * FROM sprints WHERE project_id = ? ORDER BY id DESC');
+        return stmt.all(projectId);
+    },
+
+    getTasksBySprint: (sprintId) => {
+        const stmt = db.prepare(`
+            SELECT t.* FROM tasks t
+            JOIN sprint_tasks st ON t.id = st.task_id
+            WHERE st.sprint_id = ?
+        `);
+        return stmt.all(sprintId);
+    },
+
+    addTaskToSprint: (sprintId, taskId) => {
+        // сначала удаляем задачу из других спринтов, если она там была
+        db.prepare("DELETE FROM sprint_tasks WHERE task_id = ?").run(taskId);
+        const stmt = db.prepare("INSERT INTO sprint_tasks (sprint_id, task_id) VALUES (?, ?)");
+        return stmt.run(sprintId, taskId);
+    },
+
+    removeTaskFromSprint: (taskId) => {
+        const stmt = db.prepare("DELETE FROM sprint_tasks WHERE task_id = ?");
+        return stmt.run(taskId);
+    },
+
+    updateSprintStatus: (sprintId, status) => {
+        // Если мы делаем спринт ACTIVE, нужно убедиться, что других ACTIVE спринтов в этом проекте нет
+        if (status === 'ACTIVE') {
+            const sprint = db.prepare("SELECT project_id FROM sprints WHERE id = ?").get(sprintId);
+            if (sprint) {
+                // Если были другие активные спринты, завершаем их и переносим незавершенные задачи в бэклог
+                const activeSprints = db.prepare("SELECT id FROM sprints WHERE project_id = ? AND status = 'ACTIVE'").all(sprint.project_id);
+                activeSprints.forEach(activeSprint => {
+                    // Убираем незавершенные задачи из активного спринта (возвращаем в бэклог)
+                    db.prepare(`
+                        DELETE FROM sprint_tasks 
+                        WHERE sprint_id = ? 
+                        AND task_id IN (SELECT id FROM tasks WHERE status != 'DONE')
+                    `).run(activeSprint.id);
+                    db.prepare("UPDATE sprints SET status = 'COMPLETED' WHERE id = ?").run(activeSprint.id);
+                });
+            }
+        }
+        
+        // Если мы завершаем текущий спринт
+        if (status === 'COMPLETED') {
+            // Убираем незавершенные задачи из завершаемого спринта (возвращаем в бэклог)
+            db.prepare(`
+                DELETE FROM sprint_tasks 
+                WHERE sprint_id = ? 
+                AND task_id IN (SELECT id FROM tasks WHERE status != 'DONE')
+            `).run(sprintId);
+        }
+
+        const stmt = db.prepare("UPDATE sprints SET status = ? WHERE id = ?");
+        return stmt.run(status, sprintId);
+    }
 }
 
 // тестовый проект

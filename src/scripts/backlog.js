@@ -1,5 +1,3 @@
-// import {loadBacklog} from './tasks.js'
-
 const dialog = document.getElementById('myDialog');
 const backlogFormDialog = document.getElementById('backlogFormDialog');
 
@@ -19,7 +17,6 @@ backlogFormDialog.onsubmit = (e) => {
     if(backlogName) {
         createBacklog(backlogName, description, priority);
         
-        // Исправлено: очищаем value, а не перезаписываем переменные
         input.value = '';
         descriptionInput.value = '';
         priorityInput.value = 'Средний'; 
@@ -27,6 +24,90 @@ backlogFormDialog.onsubmit = (e) => {
         dialog.close();
     }
 }
+
+// Диалоги для спринтов
+const sprintDialog = document.getElementById('sprintDialog');
+const sprintFormDialog = document.getElementById('sprintFormDialog');
+const startSprintDialog = document.getElementById('startSprintDialog');
+const startSprintFormDialog = document.getElementById('startSprintFormDialog');
+const completeSprintDialog = document.getElementById('completeSprintDialog');
+const completeSprintFormDialog = document.getElementById('completeSprintFormDialog');
+
+sprintFormDialog.onsubmit = async (e) => {
+    e.preventDefault();
+    const input = document.getElementById('sprintNameInput');
+    const name = input.value.trim();
+    if (!name) return;
+
+    try {
+        const res = await fetch('/api/sprints', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ name: name, project_id: 1 })
+        });
+        if (res.ok) {
+            input.value = '';
+            sprintDialog.close();
+            loadBacklog(); // Обновляем всё
+        } else {
+            console.error("Ошибка при создании спринта");
+        }
+    } catch(err) {
+        console.error("Ошибка:", err);
+    }
+};
+
+startSprintFormDialog.onsubmit = async (e) => {
+    e.preventDefault();
+    const sprintId = document.getElementById('startSprintId').value;
+    try {
+        const res = await fetch(`/api/sprints/${sprintId}/status`, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ status: 'ACTIVE' })
+        });
+        if (res.ok) {
+            startSprintDialog.close();
+            loadBacklog();
+        }
+    } catch(err) {
+        console.error("Ошибка:", err);
+    }
+};
+
+completeSprintFormDialog.onsubmit = async (e) => {
+    e.preventDefault();
+    const sprintId = document.getElementById('completeSprintId').value;
+    try {
+        const res = await fetch(`/api/sprints/${sprintId}/status`, {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ status: 'COMPLETED' })
+        });
+        if (res.ok) {
+            completeSprintDialog.close();
+            loadBacklog();
+        }
+    } catch(err) {
+        console.error("Ошибка:", err);
+    }
+};
+
+function createNewSprint() {
+    document.getElementById('sprintNameInput').value = '';
+    sprintDialog.showModal();
+}
+
+function startSprint(sprintId) {
+    document.getElementById('startSprintId').value = sprintId;
+    startSprintDialog.showModal();
+}
+
+function completeSprint(sprintId) {
+    document.getElementById('completeSprintId').value = sprintId;
+    completeSprintDialog.showModal();
+}
+
 
 async function createBacklog(name, description, priority) {
     const messageSpan = document.getElementById('message');
@@ -46,7 +127,7 @@ async function createBacklog(name, description, priority) {
         if (response.ok) {
             messageSpan.style.color = "green";
             messageSpan.textContent = "Беклог успешно создан!";
-            loadBacklog(); // перезагружаем список
+            loadBacklog(); 
             
             setTimeout(() => {
                 messageSpan.textContent = '';
@@ -63,78 +144,111 @@ async function createBacklog(name, description, priority) {
     }
 }
 
+function createTaskElement(t) {
+    const li = document.createElement('li');
+    li.className = `task-card priority-${t.priority}`;
+    li.dataset.taskId = t.id;
+    
+    const priorities = ['Высокий', 'Средний', 'Низкий'];
+    const priorityDropdown = `
+        <select onchange="updateTaskPriority(${t.id}, this.value)">
+            ${priorities.map(p => `<option value="${p}" ${t.priority === p ? 'selected' : ''}>${p}</option>`).join('')}
+        </select>
+    `;
 
+    li.innerHTML = `
+        <div class="task-content">
+            <strong>${t.title}</strong>
+            <p>Приоритет: ${priorityDropdown}</p>
+        </div>
+        <div class="task-actions">
+            <button type="button" class="btn-delete" onclick="if(confirm('Удалить задачу?')) deleteBacklog(${t.id})">Удалить</button>
+        </div>
+    `;
+    return li;
+}
 
 async function loadBacklog() {
     try {
-        const res = await fetch('/api/backlogs');
-        const tasks = await res.json();
-        
-        // const lists = {
-        //     'TODO': document.querySelector('#col-todo .task-list'),
-        //     'IN_PROGRESS': document.querySelector('#col-progress .task-list'),
-        //     'TESTING': document.querySelector('#col-testing .task-list'),
-        //     'DONE': document.querySelector('#col-done .task-list')
-        // };
-        const location = document.querySelector('#blShow .bl-list');
-        
-        // очищаем список чтобы при отрисовывании задачи не дублировались (именно в list.innerHTML = "" - типа всё что внутри элемента очсищаем) 
-        // Object.values(lists).forEach(list => list.innerHTML = "");
-        location.innerHTML = "";
+        // Получаем все задачи
+        const resTasks = await fetch('/api/backlogs');
+        const tasks = await resTasks.json();
 
-        tasks.forEach(t => {
-            // const status = t.status || 'TODO';
-            // const targetList = lists[status];
+        // Получаем все спринты
+        const resSprints = await fetch('/api/sprints');
+        let sprints = [];
+        if (resSprints.ok) {
+            sprints = await resSprints.json();
+        }
 
-            if (location) {
-                const li = document.createElement('li');
-                li.className = `task-card priority-${t.priority}`;
-                li.dataset.taskId = t.id;
-                
-                // Генерируем кнопки в зависимости от статуса
-                let buttonsHtml = '';
-                // if (status === 'TODO') {
-                //     buttonsHtml = `<button onclick="updateTaskStatus(${t.id}, 'IN_PROGRESS')">В работу</button>`;
-                // } else if (status === 'IN_PROGRESS') {
-                //     buttonsHtml = `
-                //         <button onclick="updateTaskStatus(${t.id}, 'TODO')">Назад</button>
-                //         <button onclick="updateTaskStatus(${t.id}, 'TESTING')">Тестировать</button>
-                //     `;
-                // } else if (status === 'TESTING') {
-                //     buttonsHtml = `
-                //         <button onclick="updateTaskStatus(${t.id}, 'IN_PROGRESS')">Назад</button>
-                //         <button onclick="updateTaskStatus(${t.id}, 'DONE')">Готово</button>
-                //     `;
-                // } else if (status === 'DONE') {
-                //     buttonsHtml = `<button onclick="updateTaskStatus(${t.id}, 'IN_PROGRESS')">Вернуть в работу</button>`;
-                // }
-
-                const priorities = ['Высокий', 'Средний', 'Низкий'];
-                const priorityDropdown = `
-                    <select onchange="updateTaskPriority(${t.id}, this.value)">
-                        ${priorities.map(p => `<option value="${p}" ${t.priority === p ? 'selected' : ''}>${p}</option>`).join('')}
-                    </select>
-                `;
-
-                li.innerHTML = `
-                    <div class="task-content">
-                        <strong>${t.title}</strong>
-                        <p>Приоритет: ${priorityDropdown}</p>
-                    </div>
-                    <div class="task-actions">
-                        ${buttonsHtml}
-                        <button class="btn-delete" onclick="if(confirm('Удалить задачу?')) deleteBacklog(${t.id})">Удалить</button>
-                    </div>
-                `;
-                location.appendChild(li);
+        // Вычисляем, какие задачи уже в спринтах
+        const tasksInSprints = new Set();
+        sprints.forEach(s => {
+            if (s.tasks) {
+                s.tasks.forEach(t => tasksInSprints.add(t.id));
             }
         });
-        // initSortable();
+
+        // Задачи для бэклога
+        const backlogTasks = tasks.filter(t => !tasksInSprints.has(t.id));
+
+        // Отрисовка спринтов
+        const sprintsContainer = document.getElementById('sprintsContainer');
+        sprintsContainer.innerHTML = '';
+        
+        sprints.forEach(sprint => {
+            if (sprint.status === 'COMPLETED') return; // Можно скрывать или показывать по-другому
+
+            const div = document.createElement('div');
+            div.className = 'sprint-block';
+            div.style.border = '1px solid #ccc';
+            div.style.padding = '10px';
+            div.style.marginBottom = '15px';
+            div.style.borderRadius = '5px';
+            div.style.background = sprint.status === 'ACTIVE' ? '#eef7ea' : '#f9f9f9';
+
+            let statusText = sprint.status === 'ACTIVE' ? '(Активен)' : '(Запланирован)';
+            
+            let btnAction = '';
+            if (sprint.status === 'TODO') {
+                btnAction = `<button type="button" onclick="startSprint(${sprint.id})">Начать спринт</button>`;
+            } else if (sprint.status === 'ACTIVE') {
+                btnAction = `<button type="button" onclick="completeSprint(${sprint.id})">Завершить спринт</button>`;
+            }
+
+            div.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h3>${sprint.name} ${statusText}</h3>
+                    ${btnAction}
+                </div>
+                <ul class="bl-list sprint-task-list" data-sprint-id="${sprint.id}" style="min-height: 50px; background: #fff; padding: 10px; border: 1px dashed #ccc;">
+                </ul>
+            `;
+            
+            const ul = div.querySelector('ul');
+            if (sprint.tasks) {
+                sprint.tasks.forEach(t => {
+                    ul.appendChild(createTaskElement(t));
+                });
+            }
+            
+            sprintsContainer.appendChild(div);
+        });
+
+        // Отрисовка бэклога
+        const location = document.querySelector('#blShow .bl-list');
+        location.innerHTML = "";
+        location.dataset.sprintId = "null"; // Помечаем, что это общий бэклог
+
+        backlogTasks.forEach(t => {
+            location.appendChild(createTaskElement(t));
+        });
+
+        initSortable();
     } catch (err) {
         console.error("Ошибка загрузки задач:", err);
     }
 }
-
 
 async function updateTaskPriority(taskId, priority) {
     try {
@@ -143,45 +257,45 @@ async function updateTaskPriority(taskId, priority) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ priority: priority })
         });
-
-        if (response.ok) {
-            loadBacklog();
-        }
+        if (response.ok) loadBacklog();
     } catch (err) {
         console.error("Ошибка при смене приоритета:", err);
     }
 }
 
-loadBacklog();
-
 function initSortable() {
-    const lists = document.querySelectorAll('.task-list');
+    // Инициализируем Sortable.js для бэклога и всех спринтов
+    const lists = document.querySelectorAll('.bl-list');
     lists.forEach(list => {
-        new Sortable(list, {
+        // Проверяем, не инициализирован ли он уже
+        if(list.sortableInstance) list.sortableInstance.destroy();
+
+        list.sortableInstance = new Sortable(list, {
             group: 'shared',
             animation: 150,
-            onEnd: function (evt) {
+            onEnd: async function (evt) {
                 const taskId = evt.item.dataset.taskId;
+                const toSprintId = evt.to.dataset.sprintId;
+                const fromSprintId = evt.from.dataset.sprintId;
                 
-                // Если перетащили В ДРУГУЮ колонку
-                if (evt.from !== evt.to) {
-                    const parentId = evt.to.parentElement.id;
-                    let newStatus = '';
-                    if (parentId === 'col-todo') newStatus = 'TODO';
-                    else if (parentId === 'col-progress') newStatus = 'IN_PROGRESS'; // Явно прописываем
-                    else if (parentId === 'col-testing') newStatus = 'TESTING';
-                    else if (parentId === 'col-done') newStatus = 'DONE';
-
-                    updateTaskStatus(taskId, newStatus);
-                } 
-                // Если перетащили ВНУТРИ одной колонки (сортировка)
-                else {
-                    const taskIds = Array.from(evt.to.children).map(item => item.dataset.taskId);
-                    fetch('/api/backlogs/order', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ order: taskIds })
-                    }).catch(err => console.error("Ошибка при обновлении порядка:", err));
+                // Переместили из одной колонки в другую
+                if (fromSprintId !== toSprintId) {
+                    try {
+                        if (toSprintId === "null") {
+                            // Убрали из спринта в бэклог
+                            await fetch(`/api/sprints/tasks/${taskId}`, { method: 'DELETE' });
+                        } else {
+                            // Добавили в спринт
+                            await fetch(`/api/sprints/${toSprintId}/tasks`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ task_id: taskId })
+                            });
+                        }
+                    } catch (err) {
+                        console.error('Ошибка при перемещении задачи', err);
+                        loadBacklog(); // откатываем при ошибке
+                    }
                 }
             }
         });
@@ -190,12 +304,15 @@ function initSortable() {
 
 async function deleteBacklog(taskId) {
     try {
+        // Сначала пытаемся удалить из спринтов, хотя CASCADE или отдельный вызов удалит
+        await fetch(`/api/sprints/tasks/${taskId}`, { method: 'DELETE' });
+
         const response = await fetch(`/api/backlogs/${taskId}`, {
             method: 'DELETE'
         });
 
         if (response.ok) {
-            loadBacklog(); // Перезагружаем список для отображения изменений
+            loadBacklog(); 
         } else {
             const errorData = await response.json();
             console.error('Ошибка при удалении задачи:', errorData.error);
@@ -204,3 +321,5 @@ async function deleteBacklog(taskId) {
         console.error('Ошибка сети:', err);
     }
 }
+
+loadBacklog();

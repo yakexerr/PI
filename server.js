@@ -185,6 +185,160 @@ app.patch('/api/backlogs/:id/priority', (req, res) => {
     }
 });
 
+// --- ДОСКА (Задачи активного спринта) ---
+// Отдать задачи только для активного спринта
+app.get('/api/tasks', (req, res) => {
+    try {
+        const projectId = 1; // Тестовый проект
+        const rows = dbActions.getTasksForActiveSprint(projectId);
+        res.json(rows);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/tasks', (req, res) => {
+    try {
+        const { title, project_id, priority } = req.body;
+        const pId = project_id || 1;
+
+        const posStmt = db.prepare("SELECT MAX(position) as max_pos FROM tasks");
+        const maxPos = posStmt.get().max_pos || 0;
+        const newPos = maxPos + 1;
+
+        const stmt = db.prepare("INSERT INTO tasks (title, project_id, status, priority, position) VALUES (?, ?, ?, ?, ?)");
+        const info = stmt.run(title, pId, 'TODO', priority, newPos);
+        
+        // Если добавляем задачу прямо с доски, привязываем её к активному спринту
+        const activeSprint = db.prepare("SELECT id FROM sprints WHERE project_id = ? AND status = 'ACTIVE'").get(pId);
+        if (activeSprint) {
+            dbActions.addTaskToSprint(activeSprint.id, info.lastInsertRowid);
+        }
+
+        res.json({ id: info.lastInsertRowid, title, status: 'TODO', priority, position: newPos });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.patch('/api/tasks/:id', (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+        const stmt = db.prepare("UPDATE tasks SET status = ? WHERE id = ?");
+        const info = stmt.run(status, id);
+
+        if (info.changes > 0) {
+            res.json({ message: 'Статус обновлен', id, status });
+        } else {
+            res.status(404).json({ error: 'Задача не найдена' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.patch('/api/tasks/:id/priority', (req, res) => {
+    try {
+        const { id } = req.params;
+        const { priority } = req.body;
+        const stmt = db.prepare("UPDATE tasks SET priority = ? WHERE id = ?");
+        const info = stmt.run(priority, id);
+        if (info.changes > 0) res.json({ message: 'Приоритет обновлен' });
+        else res.status(404).json({ error: 'Не найдено' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.delete('/api/tasks/:id', (req, res) => {
+    try {
+        const { id } = req.params;
+        dbActions.removeTaskFromSprint(id);
+        const stmt = db.prepare("DELETE FROM tasks WHERE id = ?");
+        const info = stmt.run(id);
+        if (info.changes > 0) res.json({ message: 'Удалено' });
+        else res.status(404).json({ error: 'Не найдено' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/tasks/order', (req, res) => {
+    try {
+        const { order } = req.body;
+        const updateStmt = db.prepare("UPDATE tasks SET position = ? WHERE id = ?");
+        db.transaction(() => {
+            order.forEach((taskId, index) => {
+                updateStmt.run(index, taskId);
+            });
+        })();
+        res.json({ message: 'Порядок обновлен' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// СПРИНТЫ
+app.get('/api/sprints', (req, res) => {
+    try {
+        const projectId = 1;
+        const sprints = dbActions.getSprintsByProject(projectId);
+        
+        // для каждого спринта получаем его задачи
+        sprints.forEach(sprint => {
+            sprint.tasks = dbActions.getTasksBySprint(sprint.id);
+        });
+        
+        res.json(sprints);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/sprints', (req, res) => {
+    try {
+        const { name, project_id } = req.body;
+        const pId = project_id || 1;
+        const info = dbActions.createSprint(pId, name || 'Новый спринт');
+        res.json({ id: info.lastInsertRowid, name, status: 'TODO' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/sprints/:id/tasks', (req, res) => {
+    try {
+        const sprintId = req.params.id;
+        const { task_id } = req.body;
+        dbActions.addTaskToSprint(sprintId, task_id);
+        res.json({ message: 'Задача добавлена в спринт' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.delete('/api/sprints/tasks/:taskId', (req, res) => {
+    try {
+        const taskId = req.params.taskId;
+        dbActions.removeTaskFromSprint(taskId);
+        res.json({ message: 'Задача убрана из спринта' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.put('/api/sprints/:id/status', (req, res) => {
+    try {
+        const sprintId = req.params.id;
+        const { status } = req.body;
+        dbActions.updateSprintStatus(sprintId, status);
+        res.json({ message: 'Статус спринта обновлен', status });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // ВСЕГДА ДОЛЖЕН БЫЬ ВНИЗУ
 app.listen(PORT, () => {
     console.log(`Сервер запущен: http://localhost:${PORT}`);

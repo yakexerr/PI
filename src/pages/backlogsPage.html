@@ -40,8 +40,8 @@
                     <form id="backlogForm">
                         <div id="sprintStarter">
                             <h2 class="sprint-h1">Спринты</h2>
-                            <!-- <input type="checkbox" id="backlogToStart"> -->
-                            <button type="button" id="btn-start">+ Создать</button>
+                            <button type="button" id="btn-start" onclick="createNewSprint()">+ Создать спринт</button>
+                            <div id="sprintsContainer"></div>
                         </div>
                         <div id="backlogMaker">
                             <h2 class="backlog-h1">Беклоги</h2>
@@ -78,6 +78,44 @@
                             <div>
                                 <button type="submit" class="bl-createform-btn">Создать</button>
                                 <button type="button" class="bl-createform-btn" onclick="document.getElementById('myDialog').close()">Отмена</button>
+                            </div>
+                        </form>
+                    </dialog>
+
+                    <!-- Всплывающее окно для создания спринта -->
+                    <dialog id="sprintDialog">
+                        <form id="sprintFormDialog">
+                            <p>Введите название спринта:</p>
+                            <input type="text" id="sprintNameInput" placeholder="Название спринта" required>
+                            <div>
+                                <button type="submit" class="bl-createform-btn">Создать</button>
+                                <button type="button" class="bl-createform-btn" onclick="document.getElementById('sprintDialog').close()">Отмена</button>
+                            </div>
+                        </form>
+                    </dialog>
+
+                    <!-- Всплывающее окно для старта спринта -->
+                    <dialog id="startSprintDialog">
+                        <form id="startSprintFormDialog">
+                            <p>Вы уверены, что хотите начать этот спринт?</p>
+                            <p style="font-size: 14px; color: #666;">Остальные активные спринты будут завершены, а их незавершенные задачи вернутся в бэклог.</p>
+                            <input type="hidden" id="startSprintId">
+                            <div>
+                                <button type="submit" class="bl-createform-btn">Начать</button>
+                                <button type="button" class="bl-createform-btn" onclick="document.getElementById('startSprintDialog').close()">Отмена</button>
+                            </div>
+                        </form>
+                    </dialog>
+
+                    <!-- Всплывающее окно для завершения спринта -->
+                    <dialog id="completeSprintDialog">
+                        <form id="completeSprintFormDialog">
+                            <p>Завершить этот спринт?</p>
+                            <p style="font-size: 14px; color: #666;">Незавершенные задачи будут возвращены в бэклог.</p>
+                            <input type="hidden" id="completeSprintId">
+                            <div>
+                                <button type="submit" class="bl-createform-btn">Завершить</button>
+                                <button type="button" class="bl-createform-btn" onclick="document.getElementById('completeSprintDialog').close()">Отмена</button>
                             </div>
                         </form>
                     </dialog>

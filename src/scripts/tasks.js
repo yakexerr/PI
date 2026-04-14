@@ -156,7 +156,9 @@ document.getElementById('taskForm').addEventListener('submit', async function(e)
 function initSortable() {
     const lists = document.querySelectorAll('.task-list');
     lists.forEach(list => {
-        new Sortable(list, {
+        if(list.sortableInstance) list.sortableInstance.destroy();
+        
+        list.sortableInstance = new Sortable(list, {
             group: 'shared',
             animation: 150,
             onEnd: function (evt) {
