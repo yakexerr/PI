@@ -76,8 +76,6 @@ app.post('/api/backlogs', (req, res) => {
         const { title, project_id, priority } = req.body;
         const pId = project_id || 1;
 
-        console.log("Пытаюсь создать задачу для проекта ID:", pId);
-
         // Получаем максимальную позицию и ставим новую задачу в конец
         const posStmt = db.prepare("SELECT MAX(position) as max_pos FROM tasks");
         const maxPos = posStmt.get().max_pos || 0;
@@ -95,7 +93,7 @@ app.post('/api/backlogs', (req, res) => {
 // Обновить порядок задач
 app.post('/api/backlogs/order', (req, res) => {
     try {
-        const { order } = req.body; // order - это массив ID в новом порядке
+        const { order } = req.body;
         
         const updateStmt = db.prepare("UPDATE tasks SET position = ? WHERE id = ?");
 
@@ -185,7 +183,8 @@ app.patch('/api/backlogs/:id/priority', (req, res) => {
     }
 });
 
-// --- ДОСКА (Задачи активного спринта) ---
+// ДОСКА (Задачи активного спринта)
+
 // Отдать задачи только для активного спринта
 app.get('/api/tasks', (req, res) => {
     try {

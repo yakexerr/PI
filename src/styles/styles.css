@@ -583,3 +583,55 @@ img{
     cursor: pointer;
     transition: background 0.3s;
 }
+
+/* Дизайн карточек задач в бэклоге */
+.bl-list .task-card {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    gap: 20px;
+}
+
+.bl-list .task-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 30px;
+    flex: 1;
+}
+
+.bl-list .task-content strong {
+    font-size: 16px;
+    flex: 1;
+}
+
+.bl-list .task-content p {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+    color: #666;
+}
+
+.bl-list .task-content select {
+    padding: 4px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #f9f9f9;
+}
+
+.bl-list .task-actions {
+    border-top: none;
+    padding-top: 0;
+    width: auto;
+    display: flex;
+    align-items: center;
+}
+
+.bl-list .task-actions button {
+    flex: none;
+    padding: 8px 15px;
+    width: auto;
+}
