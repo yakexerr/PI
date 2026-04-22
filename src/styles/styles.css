@@ -635,3 +635,31 @@ img{
     padding: 8px 15px;
     width: auto;
 }
+
+.sprint-createform-btn{
+    width: 47%;
+    padding: 12px;
+    /* background-color: #d8dadd;  */
+    color: rgb(90, 88, 88);
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.3s;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.sprint-cancelform-btn{
+    width: 47%;
+    padding: 12px;
+    /* background-color: #d8dadd;  */
+    color: rgb(90, 88, 88);
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.3s;
+    font-family: Arial, Helvetica, sans-serif;
+}

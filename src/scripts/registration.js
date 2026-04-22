@@ -50,7 +50,7 @@ document.getElementById('regForm').addEventListener('submit', function(e) {
             
             // Перенаправляем в папку pages
             setTimeout(() => {
-                window.location.href = '/pages/homePage.html';
+                window.location.href = '/pages/profilePage.html';
             }, 1500); // Небольшая задержка, чтобы юзер успел увидеть радостный текст
         } else {
             const data = await response.json(); // чтение ответа от сервера при ошибке
