@@ -327,6 +327,17 @@ app.delete('/api/sprints/tasks/:taskId', (req, res) => {
     }
 });
 
+app.put('/api/sprints/:id/start', (req, res) => {
+    try {
+        const sprintId = req.params.id;
+        const data = req.body; // { name, startDate, endDate, description }
+        dbActions.startSprint(sprintId, data);
+        res.json({ message: 'Спринт начат' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 app.put('/api/sprints/:id/status', (req, res) => {
     try {
         const sprintId = req.params.id;

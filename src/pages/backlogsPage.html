@@ -95,14 +95,45 @@
                     </dialog>
 
                     <!-- Всплывающее окно для старта спринта -->
-                    <dialog id="startSprintDialog">
+                    <dialog id="startSprintDialog" style="border-radius: 10px; border: none; padding: 20px; max-width: 400px;">
                         <form id="startSprintFormDialog">
-                            <p>Вы уверены, что хотите начать этот спринт?</p>
-                            <p style="font-size: 14px; color: #666;">Остальные активные спринты будут завершены, а их незавершенные задачи вернутся в бэклог.</p>
+                            <h2 style="margin-top: 0;">Начать спринт</h2>
                             <input type="hidden" id="startSprintId">
-                            <div>
-                                <button type="submit" class="bl-createform-btn">Начать</button>
-                                <button type="button" class="bl-createform-btn" onclick="document.getElementById('startSprintDialog').close()">Отмена</button>
+                            
+                            <div class="input-group">
+                                <label>Название спринта</label>
+                                <input type="text" id="startSprintName" required>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label>Продолжительность</label>
+                                <select id="startSprintDuration" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; margin-top: 5px;">
+                                    <option value="1">1 неделя</option>
+                                    <option value="2" selected>2 недели</option>
+                                    <option value="3">3 недели</option>
+                                    <option value="4">4 недели</option>
+                                    <option value="custom">Свой вариант</option>
+                                </select>
+                            </div>
+
+                            <div class="input-group">
+                                <label>Дата начала</label>
+                                <input type="date" id="startSprintStartDate" required>
+                            </div>
+
+                            <div class="input-group">
+                                <label>Дата окончания</label>
+                                <input type="date" id="startSprintEndDate" required>
+                            </div>
+
+                            <div class="input-group">
+                                <label>Цель спринта</label>
+                                <textarea id="startSprintDescription" rows="3" placeholder="Опишите цель..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; margin-top: 5px; font-family: Arial;"></textarea>
+                            </div>
+
+                            <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+                                <button type="button" class="bl-createform-btn" style="width: auto; padding: 10px 20px;" onclick="document.getElementById('startSprintDialog').close()">Отмена</button>
+                                <button type="submit" class="btn-submit" style="width: auto; padding: 10px 20px;">Начать</button>
                             </div>
                         </form>
                     </dialog>

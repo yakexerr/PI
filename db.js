@@ -62,9 +62,20 @@ db.exec(`
         name TEXT NOT NULL,
         status TEXT DEFAULT 'TODO',
         project_id INTEGER NOT NULL,
+        start_date DATE,
+        end_date DATE,
+        description TEXT,
         FOREIGN KEY (project_id) REFERENCES projects (id)
     )
 `);
+
+// Обновление существующей таблицы (миграция для старых данных)
+const sprintCols = db.prepare("PRAGMA table_info(sprints)").all();
+if (!sprintCols.find(c => c.name === 'start_date')) {
+    db.exec("ALTER TABLE sprints ADD COLUMN start_date DATE");
+    db.exec("ALTER TABLE sprints ADD COLUMN end_date DATE");
+    db.exec("ALTER TABLE sprints ADD COLUMN description TEXT");
+}
 
 db.exec(`
     CREATE TABLE IF NOT EXISTS sprint_tasks (
@@ -191,6 +202,25 @@ export const dbActions = {
     removeTaskFromSprint: (taskId) => {
         const stmt = db.prepare("DELETE FROM sprint_tasks WHERE task_id = ?");
         return stmt.run(taskId);
+    },
+
+    startSprint: (sprintId, data) => {
+        const sprint = db.prepare("SELECT project_id FROM sprints WHERE id = ?").get(sprintId);
+        if (sprint) {
+            // Если были другие активные спринты, завершаем их и переносим незавершенные задачи
+            const activeSprints = db.prepare("SELECT id FROM sprints WHERE project_id = ? AND status = 'ACTIVE'").all(sprint.project_id);
+            activeSprints.forEach(activeSprint => {
+                db.prepare(`
+                    DELETE FROM sprint_tasks 
+                    WHERE sprint_id = ? 
+                    AND task_id IN (SELECT id FROM tasks WHERE status != 'DONE')
+                `).run(activeSprint.id);
+                db.prepare("UPDATE sprints SET status = 'COMPLETED' WHERE id = ?").run(activeSprint.id);
+            });
+        }
+        
+        const stmt = db.prepare("UPDATE sprints SET status = 'ACTIVE', name = ?, start_date = ?, end_date = ?, description = ? WHERE id = ?");
+        return stmt.run(data.name, data.startDate, data.endDate, data.description, sprintId);
     },
 
     updateSprintStatus: (sprintId, status) => {

@@ -60,11 +60,18 @@ sprintFormDialog.onsubmit = async (e) => {
 startSprintFormDialog.onsubmit = async (e) => {
     e.preventDefault();
     const sprintId = document.getElementById('startSprintId').value;
+    
+    // Собираем новые данные из формы
+    const name = document.getElementById('startSprintName')?.value || 'Спринт';
+    const startDate = document.getElementById('startSprintStartDate')?.value || null;
+    const endDate = document.getElementById('startSprintEndDate')?.value || null;
+    const description = document.getElementById('startSprintDescription')?.value || '';
+
     try {
-        const res = await fetch(`/api/sprints/${sprintId}/status`, {
+        const res = await fetch(`/api/sprints/${sprintId}/start`, {
             method: 'PUT',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ status: 'ACTIVE' })
+            body: JSON.stringify({ name, startDate, endDate, description })
         });
         if (res.ok) {
             startSprintDialog.close();
@@ -98,8 +105,30 @@ function createNewSprint() {
     sprintDialog.showModal();
 }
 
-function startSprint(sprintId) {
+function startSprint(sprintId, sprintName) {
     document.getElementById('startSprintId').value = sprintId;
+    
+    const nameInput = document.getElementById('startSprintName');
+    if (nameInput) nameInput.value = sprintName || '';
+
+    const startDateInput = document.getElementById('startSprintStartDate');
+    const endDateInput = document.getElementById('startSprintEndDate');
+    const durationSelect = document.getElementById('startSprintDuration');
+    const descInput = document.getElementById('startSprintDescription');
+    
+    if (startDateInput && endDateInput) {
+        const today = new Date();
+        startDateInput.value = today.toISOString().split('T')[0];
+        
+        // По умолчанию 2 недели
+        if (durationSelect) durationSelect.value = "2";
+        const inTwoWeeks = new Date(today);
+        inTwoWeeks.setDate(today.getDate() + 14);
+        endDateInput.value = inTwoWeeks.toISOString().split('T')[0];
+    }
+    
+    if (descInput) descInput.value = '';
+
     startSprintDialog.showModal();
 }
 
@@ -108,6 +137,33 @@ function completeSprint(sprintId) {
     completeSprintDialog.showModal();
 }
 
+// Логика авто-подсчета даты завершения при изменении продолжительности
+function updateSprintEndDate() {
+    const duration = document.getElementById('startSprintDuration').value;
+    const startDateInput = document.getElementById('startSprintStartDate').value;
+    if (!startDateInput || duration === 'custom') return;
+
+    const startDate = new Date(startDateInput);
+    const weeks = parseInt(duration, 10);
+    startDate.setDate(startDate.getDate() + (weeks * 7));
+    
+    document.getElementById('startSprintEndDate').value = startDate.toISOString().split('T')[0];
+}
+
+setTimeout(() => {
+    const durationSelect = document.getElementById('startSprintDuration');
+    const startDateInput = document.getElementById('startSprintStartDate');
+    const endDateInput = document.getElementById('startSprintEndDate');
+
+    if (durationSelect) durationSelect.addEventListener('change', updateSprintEndDate);
+    if (startDateInput) startDateInput.addEventListener('change', updateSprintEndDate);
+
+    if (endDateInput && durationSelect) {
+        endDateInput.addEventListener('change', () => {
+            durationSelect.value = 'custom';
+        });
+    }
+}, 100);
 
 async function createBacklog(name, description, priority) {
     const messageSpan = document.getElementById('message');
@@ -209,17 +265,32 @@ async function loadBacklog() {
 
             let statusText = sprint.status === 'ACTIVE' ? '(Активен)' : '(Запланирован)';
             
+            let sprintDates = '';
+            if (sprint.start_date && sprint.end_date) {
+                const start = new Date(sprint.start_date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+                const end = new Date(sprint.end_date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+                sprintDates = `<span style="font-size: 14px; color: #666; margin-left: 15px; font-weight: normal;">${start} - ${end}</span>`;
+            }
+
+            let sprintDesc = '';
+            if (sprint.description) {
+                sprintDesc = `<p style="font-size: 14px; color: #555; margin: 5px 0 0 0; font-family: Arial;"><em>Цель: ${sprint.description}</em></p>`;
+            }
+            
             let btnAction = '';
             if (sprint.status === 'TODO') {
-                btnAction = `<button type="button" onclick="startSprint(${sprint.id})">Начать спринт</button>`;
+                btnAction = `<button type="button" data-name="${sprint.name}" onclick="startSprint(${sprint.id}, this.dataset.name)">Начать спринт</button>`;
             } else if (sprint.status === 'ACTIVE') {
                 btnAction = `<button type="button" onclick="completeSprint(${sprint.id})">Завершить спринт</button>`;
             }
 
             div.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <h3>${sprint.name} ${statusText}</h3>
-                    ${btnAction}
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                    <div>
+                        <h3 style="margin: 0; display: flex; align-items: center;">${sprint.name} <span style="font-size: 14px; font-weight: normal; color: #888; margin-left: 8px;">${statusText}</span>${sprintDates}</h3>
+                        ${sprintDesc}
+                    </div>
+                    <div>${btnAction}</div>
                 </div>
                 <ul class="bl-list sprint-task-list" data-sprint-id="${sprint.id}" style="min-height: 50px; background: #fff; padding: 10px; border: 1px dashed #ccc;">
                 </ul>

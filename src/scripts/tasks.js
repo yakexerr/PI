@@ -120,39 +120,6 @@ async function deleteTask(taskId) {
 // Загружаем при старте страницы
 loadTasks();
 
-// Обработка формы
-document.getElementById('taskForm').addEventListener('submit', async function(e) {
-    e.preventDefault(); 
-
-    const titleInput = document.getElementById('taskTitle');
-    const priorityInput = document.getElementById('taskPriority');
-    const messageSpan = document.getElementById('message');
-    const title = titleInput.value;
-    const priority = priorityInput.value;
-
-    try {
-        const response = await fetch('/api/tasks', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            // отправляем объект по ТЗ: title и project_id
-            body: JSON.stringify({ title: title, project_id: 1, priority: priority })
-        });
-
-        if (response.ok) {
-            titleInput.value = ""; // очищаем поле
-            messageSpan.style.color = "green";
-            messageSpan.textContent = "Задача добавлена!";
-            loadTasks(); // перезагружаем список, чтобы увидеть новую задачу
-        } else {
-            messageSpan.style.color = "red";
-            messageSpan.textContent = "Ошибка при сохранении";
-        }
-    } catch (err) {
-        console.error('Ошибка сети:', err);
-    }
-});
-
-
 function initSortable() {
     const lists = document.querySelectorAll('.task-list');
     lists.forEach(list => {
