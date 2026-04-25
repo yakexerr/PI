@@ -7,7 +7,7 @@
     </head>
     <body>
         <div class="app-container">
-            <aside class="sidebar">
+            <aside class="sidebar" id="sidebar">
                 <div class="logo">
                     <img src="../assets/logotype.png" alt="logo">
                     <span>Task system</span>
@@ -19,8 +19,10 @@
                         <span class="arrow">▼</span>
                     </div>
                     <div class="dropdown-menu" id="projectMenu">
-                        <a href="tasksPage.html">Проект 1</a>
-                        <a href="tasksPage.html">Проект 2</a>
+                        <!-- Контейнер ТОЛЬКО для списка проектов из базы -->
+                        <div id="dynamic-project-list"></div>
+                        <!-- Статичная кнопка, которую мы никогда не трогаем -->
+                        <a href="#" class="create-project-btn" >+ Создать проект</a>
                     </div>
                 </div>
 
@@ -39,8 +41,20 @@
                 <main>
                     <!-- Контент страницы -->
                     <script src="/scripts/dropdown_menu.js"></script>
+                     <script src="../scripts/sidebar.js"></script>
                 </main>
             </div>
         </div>
+        <dialog id="projectDialog">
+            <form id="projectFormDialog">
+                <p>Создать новый проект:</p>
+                <input type="text" id="projectName" placeholder="Название проекта" required>
+                <input type="text" id="projectDesc" placeholder="Описание">
+                <div>
+                    <button type="submit">Создать</button>
+                    <button type="button" onclick="document.getElementById('projectDialog').close()">Отмена</button>
+                </div>
+            </form>
+        </dialog>
     </body>
 </html>

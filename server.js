@@ -62,12 +62,9 @@ app.get('/api/user-info', (req, res) => {
 // --- ЗАДАЧИ ---
 // Отдать список задач
 app.get('/api/backlogs', (req, res) => {
-    try {
-        const rows = db.prepare("SELECT * FROM tasks ORDER BY position, id DESC").all();
-        res.json(rows);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+    const projectId = req.query.projectId || 1;
+    const rows = db.prepare("SELECT * FROM tasks WHERE project_id = ? ORDER BY position, id DESC").all(projectId);
+    res.json(rows);
 });
 
 // Принять новую задачу
@@ -188,36 +185,34 @@ app.patch('/api/backlogs/:id/priority', (req, res) => {
 // Отдать задачи только для активного спринта
 app.get('/api/tasks', (req, res) => {
     try {
-        const projectId = 1; // Тестовый проект
-        const rows = dbActions.getTasksForActiveSprint(projectId);
-        res.json(rows);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+        const projectId = req.query.projectId || 1;
+        // Сначала пробуем взять задачи спринта
+        let tasks = dbActions.getTasksForActiveSprint(projectId);
+        // Если спринта нет, берем все задачи проекта
+        if (!tasks || tasks.length === 0) {
+            tasks = dbActions.getTasksByProject(projectId);
+        }
+        res.json(tasks);
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
+
 
 app.post('/api/tasks', (req, res) => {
     try {
         const { title, project_id, priority } = req.body;
         const pId = project_id || 1;
-
         const posStmt = db.prepare("SELECT MAX(position) as max_pos FROM tasks");
         const maxPos = posStmt.get().max_pos || 0;
         const newPos = maxPos + 1;
-
-        const stmt = db.prepare("INSERT INTO tasks (title, project_id, status, priority, position) VALUES (?, ?, ?, ?, ?)");
-        const info = stmt.run(title, pId, 'TODO', priority, newPos);
+        const stmt = db.prepare("INSERT INTO tasks (title, project_id, status, priority, position) VALUES (?, ?, 'TODO', ?, ?)");
+        const info = stmt.run(title, pId, priority, newPos);
         
-        // Если добавляем задачу прямо с доски, привязываем её к активному спринту
         const activeSprint = db.prepare("SELECT id FROM sprints WHERE project_id = ? AND status = 'ACTIVE'").get(pId);
         if (activeSprint) {
             dbActions.addTaskToSprint(activeSprint.id, info.lastInsertRowid);
         }
-
         res.json({ id: info.lastInsertRowid, title, status: 'TODO', priority, position: newPos });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+    } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 app.patch('/api/tasks/:id', (req, res) => {
@@ -344,6 +339,26 @@ app.put('/api/sprints/:id/status', (req, res) => {
         const { status } = req.body;
         dbActions.updateSprintStatus(sprintId, status);
         res.json({ message: 'Статус спринта обновлен', status });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Получить список всех проектов
+app.get('/api/projects', (req, res) => {
+    try {
+        const rows = db.prepare("SELECT * FROM projects").all();
+        res.json(rows);
+    } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+
+app.post('/api/projects', (req, res) => {
+    try {
+        const { name, description } = req.body;
+        // dbActions нужно будет дополнить методом createProject в db.js
+        const info = dbActions.createProject(name, description);
+        res.json({ id: info.lastInsertRowid, name });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

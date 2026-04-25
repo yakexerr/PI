@@ -227,7 +227,8 @@ function createTaskElement(t) {
 async function loadBacklog() {
     try {
         // Получаем все задачи
-        const resTasks = await fetch('/api/backlogs');
+        const projectId = localStorage.getItem('currentProjectId') || 1;
+        const resTasks = await fetch(`/api/backlogs?projectId=${projectId}`);
         const tasks = await resTasks.json();
 
         // Получаем все спринты

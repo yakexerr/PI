@@ -32,8 +32,9 @@ async function updateTaskPriority(taskId, priority) {
 }
 
 async function loadTasks() {
+    const projectId = localStorage.getItem('currentProjectId') || 1;
     try {
-        const res = await fetch('/api/tasks');
+        const res = await fetch(`/api/tasks?projectId=${projectId}`);
         const tasks = await res.json();
         
         const lists = {
@@ -144,8 +145,9 @@ function initSortable() {
                 } 
                 // Если перетащили ВНУТРИ одной колонки (сортировка)
                 else {
+                    const projectId = localStorage.getItem('currentProjectId') || 1;
                     const taskIds = Array.from(evt.to.children).map(item => item.dataset.taskId);
-                    fetch('/api/tasks/order', {
+                    fetch(`/api/tasks?projectId=${projectId}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ order: taskIds })
@@ -155,3 +157,41 @@ function initSortable() {
         });
     });
 }
+
+document.getElementById('taskForm').addEventListener('submit', async function(e) {
+    e.preventDefault(); 
+
+    // Берем ID текущего проекта из localStorage
+    const currentProjectId = localStorage.getItem('currentProjectId') || 1;
+
+    const titleInput = document.getElementById('taskTitle');
+    const priorityInput = document.getElementById('taskPriority');
+    const messageSpan = document.getElementById('message');
+    
+    const title = titleInput.value;
+    const priority = priorityInput.value;
+
+    try {
+        const response = await fetch('/api/tasks', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ 
+                title: title, 
+                project_id: currentProjectId, // ОТПРАВЛЯЕМ ID ПРОЕКТА
+                priority: priority 
+            })
+        });
+
+        if (response.ok) {
+            titleInput.value = ""; 
+            messageSpan.style.color = "green";
+            messageSpan.textContent = "Задача добавлена!";
+            loadTasks(); // Перезагружаем список
+        } else {
+            messageSpan.style.color = "red";
+            messageSpan.textContent = "Ошибка при сохранении";
+        }
+    } catch (err) {
+        console.error('Ошибка сети:', err);
+    }
+});

@@ -254,7 +254,15 @@ export const dbActions = {
 
         const stmt = db.prepare("UPDATE sprints SET status = ? WHERE id = ?");
         return stmt.run(status, sprintId);
-    }
+    },
+
+
+    createProject: (name, description) => {
+        const stmt = db.prepare("INSERT INTO projects (name, description) VALUES (?, ?)");
+        return stmt.run(name, description);
+    },
+
+
 }
 
 // тестовый проект
