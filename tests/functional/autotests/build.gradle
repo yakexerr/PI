@@ -1,0 +1,25 @@
+plugins {
+    id 'java'
+}
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Эта строка нужна для самого JUnit
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.0'
+    
+    // Эта строка нужна Selenide
+    testImplementation 'com.codeborne:selenide:7.2.1'
+
+    // Платформа для запуска (иногда Gradle 8+ её требует явно)
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform() 
+}
