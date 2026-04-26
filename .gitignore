@@ -8,3 +8,8 @@ users.db
 # фото-примеры
 primer.png
 backlog_primer.png
+
+#тесты
+tests/functional/autotests/.gradle/
+tests/functional/autotests/.idea/
+tests/functional/autotests/build/
