@@ -1,23 +1,60 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Просмотр</title>
-    <link rel="stylesheet" href="../styles/styles.css">
-</head>
-<body>
-    <header>
-        <nav class="navbar">
-            <ul class="nav-links">
-                <li><a href="homePage.html" class="active">Главная</a></li>
-                <li><a href="tasksPage.html">Задачи</a></li>
-                <li class="auth-link"><a href="profilePage.html">Профиль</a></li>
-            </ul>
-        </nav>
-    </header>
+    <head>
+        <meta charset="UTF-8">
+        <title>Просмотр</title>
+        <link rel="stylesheet" href="../styles/styles.css">
+    </head>
+    <body>
+        <div class="app-container">
+            <aside class="sidebar" id="sidebar">
+                <div class="logo">
+                    <img src="../assets/logotype.png" alt="logo">
+                    <span>Task system</span>
+                </div>
 
-    <main>
-        <h1>Главная</h1>
-    </main>
-</body>
+                <div class="custom-dropdown">
+                    <div class="dropdown-trigger" onclick="toggleDropdown()">
+                        <span>Проекты</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="dropdown-menu" id="projectMenu">
+                        <!-- Контейнер ТОЛЬКО для списка проектов из базы -->
+                        <div id="dynamic-project-list"></div>
+                        <!-- Статичная кнопка, которую мы никогда не трогаем -->
+                        <a href="#" class="create-project-btn" >+ Создать проект</a>
+                    </div>
+                </div>
+
+                <ul class="side-links">
+                    <li><a href="profilePage.html">Профиль</a></li>
+                </ul>
+            </aside>
+        
+            <div class="main-content">
+                <header class="navbar">
+                    <ul class="nav-links">
+                        <li><a href="tasksPage.html">Доска</a></li>
+                        <li><a href="backlogsPage.html">Бэклог</a></li>
+                    </ul>
+                </header>
+                <main>
+                    <!-- Контент страницы -->
+                    <script src="/scripts/dropdown_menu.js"></script>
+                     <script src="../scripts/sidebar.js"></script>
+                </main>
+            </div>
+        </div>
+        <dialog id="projectDialog">
+            <form id="projectFormDialog">
+                <p>Создать новый проект:</p>
+                <input type="text" id="projectName" placeholder="Название проекта" required>
+                <input type="text" id="projectDesc" placeholder="Описание">
+                <div>
+                    <button type="submit">Создать</button>
+                    <button type="button" onclick="document.getElementById('projectDialog').close()">Отмена</button>
+                </div>
+            </form>
+        </dialog>
+    </body>
 </html>

@@ -36,12 +36,11 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
             messageSpan.textContent = "Вход выполнен! Переходим...";
             
             setTimeout(() => {
-                // Убедись, что такой файл реально есть по этому пути!
                 window.location.href = '/pages/profilePage.html'; 
             }, 1500);
         } else {
             messageSpan.style.color = "red";
-            messageSpan.textContent = data.error || "Ошибка входа";
+            messageSpan.textContent = data.message || "Ошибка входа";
         }
     })
     .catch(err => {

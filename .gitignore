@@ -4,3 +4,7 @@ node_modules/
 # База данных
 users.db
 .DS_Store
+
+# фото-примеры
+primer.png
+backlog_primer.png

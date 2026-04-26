@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <title>Беклоги</title>
+        <link rel="stylesheet" href="../styles/styles.css">
+    </head>
+    <body>
+        <div class="app-container">
+            <aside class="sidebar" id="sidebar">
+                <div class="logo">
+                    <img src="../assets/logotype.png" alt="logo">
+                    <span>Task system</span>
+                </div>
+
+                <div class="custom-dropdown">
+                    <div class="dropdown-trigger" onclick="toggleDropdown()">
+                        <span>Проекты</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="dropdown-menu" id="projectMenu">
+                        <!-- Контейнер ТОЛЬКО для списка проектов из базы -->
+                        <div id="dynamic-project-list"></div>
+                        <!-- Статичная кнопка, которую мы никогда не трогаем -->
+                        <a href="#" class="create-project-btn" >+ Создать проект</a>
+                    </div>
+                </div>
+
+                <ul class="side-links">
+                    <li><a href="profilePage.html">Профиль</a></li>
+                </ul>
+            </aside>
+            <div class="main-content">
+                <header class="navbar">
+                    <ul class="nav-links">
+                        <li><a href="tasksPage.html">Доска</a></li>
+                        <li><a href="backlogsPage.html">Бэклог</a></li>
+                    </ul>
+                </header>
+                <main>
+                    <h1 class="task-h1">Беклоги</h1>
+                    <form id="backlogForm">
+                        <div id="sprintStarter">
+                            <h2 class="sprint-h1">Спринты</h2>
+                            <button type="button" id="btn-start" onclick="createNewSprint()">+ Создать спринт</button>
+                            <div id="sprintsContainer"></div>
+                        </div>
+                        <div id="backlogMaker">
+                            <h2 class="backlog-h1">Беклоги</h2>
+                            <!-- <input type="checkbox" id="backlogMaked"> -->
+                            <button type="button" id="btn-create">+ Создать</button>
+                            <div id="blShow">
+                                <ul class="bl-list"></ul>
+                            </div>
+
+                        </div>
+                        <div class="msgdiv">
+                            <span id="message"></span>
+                        </div>
+                    </form>
+
+                    <!-- Всплывающее диалоговое окно для создания беклога -->
+                    <dialog id="myDialog">
+                        <form id="backlogFormDialog">
+                            <p>Введите информацию о беклоге:</p>
+                            <input type="text" id="backlogNameInput" placeholder="Название" required>
+                            <input type="text" id="backlogDescriptInput" placeholder="Что нужно сделать?" required>
+                            
+                            <div class="taskPriorityDiv">
+                                <div class="taskPriorityLabel">
+                                    <label for="taskPriority">Приоритет задачи</label>
+                                </div>
+                                <select id="taskPriority">
+                                    <option value="Высокий">Высокий</option>
+                                    <option value="Средний" selected>Средний</option>
+                                    <option value="Низкий">Низкий</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <button type="submit" class="bl-createform-btn">Создать</button>
+                                <button type="button" class="bl-createform-btn" onclick="document.getElementById('myDialog').close()">Отмена</button>
+                            </div>
+                        </form>
+                    </dialog>
+
+                    <!-- Всплывающее окно для создания спринта -->
+                    <dialog id="sprintDialog">
+                        <form id="sprintFormDialog">
+                            <p>Введите название спринта:</p>
+                            <input type="text" id="sprintNameInput" placeholder="Название спринта" required>
+                            <div>
+                                <button type="submit" class="sprint-createform-btn">Создать</button>
+                                <button type="button" class="sprint-cancelform-btn" onclick="document.getElementById('sprintDialog').close()">Отмена</button>
+                            </div>
+                        </form>
+                    </dialog>
+
+                    <!-- Всплывающее окно для старта спринта -->
+                    <dialog id="startSprintDialog" style="border-radius: 10px; border: none; padding: 20px; max-width: 400px;">
+                        <form id="startSprintFormDialog">
+                            <h2 style="margin-top: 0;">Начать спринт</h2>
+                            <input type="hidden" id="startSprintId">
+                            
+                            <div class="input-group">
+                                <label>Название спринта</label>
+                                <input type="text" id="startSprintName" required>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label>Продолжительность</label>
+                                <select id="startSprintDuration" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; margin-top: 5px;">
+                                    <option value="1">1 неделя</option>
+                                    <option value="2" selected>2 недели</option>
+                                    <option value="3">3 недели</option>
+                                    <option value="4">4 недели</option>
+                                    <option value="custom">Свой вариант</option>
+                                </select>
+                            </div>
+
+                            <div class="input-group">
+                                <label>Дата начала</label>
+                                <input type="date" id="startSprintStartDate" required>
+                            </div>
+
+                            <div class="input-group">
+                                <label>Дата окончания</label>
+                                <input type="date" id="startSprintEndDate" required>
+                            </div>
+
+                            <div class="input-group">
+                                <label>Цель спринта</label>
+                                <textarea id="startSprintDescription" rows="3" placeholder="Опишите цель..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; margin-top: 5px; font-family: Arial;"></textarea>
+                            </div>
+
+                            <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+                                <button type="button" class="bl-createform-btn" style="width: auto; padding: 10px 20px;" onclick="document.getElementById('startSprintDialog').close()">Отмена</button>
+                                <button type="submit" class="btn-submit" style="width: auto; padding: 10px 20px;">Начать</button>
+                            </div>
+                        </form>
+                    </dialog>
+
+                    <!-- Всплывающее окно для завершения спринта -->
+                    <dialog id="completeSprintDialog">
+                        <form id="completeSprintFormDialog">
+                            <p>Завершить этот спринт?</p>
+                            <p style="font-size: 14px; color: #666;">Незавершенные задачи будут возвращены в бэклог.</p>
+                            <input type="hidden" id="completeSprintId">
+                            <div>
+                                <button type="submit" class="bl-createform-btn">Завершить</button>
+                                <button type="button" class="bl-createform-btn" onclick="document.getElementById('completeSprintDialog').close()">Отмена</button>
+                            </div>
+                        </form>
+                    </dialog>
+                </main>
+            </div>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+        <script src="/scripts/dropdown_menu.js"></script>
+        <script src="../scripts/backlog.js"></script>
+         <script src="../scripts/sidebar.js"></script>
+
+        <dialog id="projectDialog">
+            <form id="projectFormDialog">
+                <p>Создать новый проект:</p>
+                <input type="text" id="projectName" placeholder="Название проекта" required>
+                <input type="text" id="projectDesc" placeholder="Описание">
+                <div>
+                    <button type="submit">Создать</button>
+                    <button type="button" onclick="document.getElementById('projectDialog').close()">Отмена</button>
+                </div>
+            </form>
+        </dialog>
+    </body>
+</html>

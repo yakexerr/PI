@@ -5,24 +5,61 @@
         <meta charset="UTF-8">
         <title>Профиль</title>
     </head>
-    <header>
-        <nav class="navbar">
-            <ul class="nav-links">
-                <li><a href="homePage.html">Главная</a></li>
-                <li><a href="tasksPage.html">Задачи</a></li>
-                <li class="auth-link"><a href="profilePage.html" class="active">Профиль</a></li>
-            </ul>
-        </nav>
-    </header>
     <body>
-        <hr>
-        <h1>Профиль</h1>
-        <img src="/assets/trut.jpg" alt="Фото профиля" style="border-radius: 50%; width: 150px; height: 150px; object-fit: cover;" >
-        <div class="profile-info">
-            <p>Имя: <span id="p-name">Загрузка...</span></p>
-            <p>Фамилия: <span id="p-lastname">Загрузка...</span></p>
-            <p>Дата рождения: <span id="p-birthDate">Загрузка...</span></p>
+        <div class="app-container">
+             <aside class="sidebar" id="sidebar">
+                <div class="logo">
+                    <img src="../assets/logotype.png" alt="logo">
+                    <span>Task system</span>
+                </div>
+
+                <div class="custom-dropdown">
+                    <div class="dropdown-trigger" onclick="toggleDropdown()">
+                        <span>Проекты</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="dropdown-menu" id="projectMenu">
+                        <!-- Контейнер ТОЛЬКО для списка проектов из базы -->
+                        <div id="dynamic-project-list"></div>
+                        <!-- Статичная кнопка, которую мы никогда не трогаем -->
+                        <a href="#" class="create-project-btn">+ Создать проект</a>
+                    </div>
+                </div>
+
+                <ul class="side-links">
+                    <li><a href="profilePage.html">Профиль</a></li>
+                </ul>
+            </aside>
+            <div class="main-content">
+                <main>
+                    <h1>Профиль</h1>
+                    <img src="/assets/trut.jpg" alt="Фото профиля" style="border-radius: 50%; width: 150px; height: 150px; object-fit: cover;" >
+                    <div class="profile-info">
+                        <p>Имя: <span id="p-name">Загрузка...</span></p>
+                        <p>Фамилия: <span id="p-lastname">Загрузка...</span></p>
+                        <p>Дата рождения: <span id="p-birthDate">Загрузка...</span></p>
+                        <p>Роль: <span id="p-role">Загрузка...</span></p>
+                    </div>
+                    <div class="center-content">
+                        <button id="logout-button">Выйти</button>
+                    </div>
+                    <script src="/scripts/profile.js"></script>
+                    <script src="/scripts/logout.js"></script>
+                    <script src="/scripts/dropdown_menu.js"></script>
+                     <script src="../scripts/sidebar.js"></script>
+                </main>
+            </div>
         </div>
-        <script src="/scripts/profile.js"></script>
+        <dialog id="projectDialog">
+            <form id="projectFormDialog">
+                <p>Создать новый проект:</p>
+                <input type="text" id="projectName" placeholder="Название проекта" required>
+                <input type="text" id="projectDesc" placeholder="Описание">
+                <div>
+                    <button type="submit">Создать</button>
+                    <button type="button" onclick="document.getElementById('projectDialog').close()">Отмена</button>
+                </div>
+            </form>
+        </dialog>
     </body>
 </html>

@@ -1,59 +1,205 @@
-/* НАВИГАЦИЯ */
-
-.navbar {
+/* Основная часть (справа) */
+.main-content {
+    flex-grow: 1; /* Растягивается на всё оставшееся место */
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    min-width: 0; /* Важно, чтобы контент не выталкивал сайдбар */
+}
+
+/* Контейнер всего приложения */
+.app-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* НАВИГАЦИЯ */
+    /* APPBAR */
+.navbar {
+    height: 50px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
     align-items: center;
-    background-color: rgb(255, 123, 0); 
-    padding: 10px 20px; 
-    color: white;
-    font-family: Arial, Helvetica, sans-serif;
+    padding: 0 20px;
 }
 
-.navbar .logo {
-    font-size: 1.5rem;
-    font-weight: bold;
+.logo-link {
+    display: flex;
+    align-items: center; /* Логотип центрируем отдельно */
+    text-decoration: none;
 }
-
-
-
-
 
 .nav-links {
     display: flex;
     list-style: none;
     margin: 0;
     padding: 0;
-    gap: 1.5rem;
-    width: 100%;
+    flex-grow: 1; /* Чтобы список занял всё место */
 }
 
+.side-links {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex-grow: 1; /* Чтобы список занял всё место */
+}
+
+/* Ссылки */
 .nav-links a {
+    display: flex;
+    align-items: center;   /* Центрируем текст внутри ссылки по вертикали */
     text-decoration: none;
     font-weight: 500;
-    padding: 5px 15px;
-    transition: color 0.3s ease;
-    color: white;
+    padding: 0 15px;       /* Паддинг только по бокам */
+    height: 100%;          /* Ссылка теперь высотой 48px */
+    color: #444;
+    transition: all 0.2s ease;
+    border-bottom: 2px solid transparent; /* Запас места для линии */
 }
 
-.nav-links li.auth-link {
-    /* display: flex; */
-    margin-left: auto;
+/* Общий стиль для ВСЕХ активных вкладок (включая профиль) */
+.nav-links a.active {
+    color: #0052cc !important;
+    border-bottom: 2px solid #0052cc !important;
 }
 
 .nav-links a:hover {
-    color: #757575;
+    background-color: #f0f0f0;
+    color: #0052cc;
 }
 
-.nav-links a.active {
-    background-color: rgba(255, 255, 255, 0.2);
-    border-radius: 50px;
-    padding: 5px 15px;
+/* Профиль улетает вправо */
+.nav-links li.auth-link {
+    margin-left: auto;
+    display: flex; /* Чтобы li не схлопывался */
 }
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0px; /* отступ между картинкой и текстом */
+}
+
+.logo img {
+    height: 50px;
+    width: auto;
+    margin-bottom: 20px;
+}
+
+.logo span {
+    font-size: 1rem;
+    font-weight: 400; /* как у остальных ссылок */
+    color: #333;
+    white-space: nowrap; /* запрет переноса на 2 строки */
+    text-transform: lowercase; 
+    margin-bottom: 20px;
+    margin-right: 130px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
 
 .nav-buttons {
     border: 1px solid rgb(93, 144, 211);
 }
+
+
+    /* SIDEBAR */
+/* Сайдбар (слева) */
+.sidebar {
+    width: 240px;
+    background-color: #f4f5f7;
+    border-right: 1px solid #ddd;
+    padding: 20px;
+    flex-shrink: 0;
+}
+
+#projectSelector {
+    width: 180px;
+    border: none;
+    margin-left: 10px;
+    background-color: #f4f5f7;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: 500;
+    color: #444;
+    transition: all 0.2s ease;
+    font-size: 16px;
+}
+
+
+.side-links {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    flex-grow: 1; /* Чтобы список занял всё место */
+}
+
+.side-links a{
+    display: flex;
+    align-items: center;   /* Центрируем текст внутри ссылки по вертикали */
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0 15px;
+    height: 100%;
+    color: #444;
+    transition: all 0.2s ease;
+    margin-top: 10px; 
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.side-links a.active {
+    color: #0052cc !important;
+    border-bottom: 2px solid #0052cc !important;
+}
+
+.side-links a:hover {
+    background-color: #f0f0f0;
+    color: #0052cc;
+}
+
+.custom-dropdown {
+    position: relative;
+    margin: 20px 10px;
+    cursor: pointer;
+}
+
+.dropdown-trigger {
+    padding: 8px 12px;
+    background: #e2e4e8;
+    background-color: #ddd;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+    font-weight: 500;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.dropdown-menu {
+    display: none; /* Скрыто по умолчанию */
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: white;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border-radius: 4px;
+    z-index: 100;
+}
+
+.dropdown-menu a {
+    display: block;
+    padding: 8px 12px;
+    text-decoration: none;
+    color: #333;
+}
+
+.dropdown-menu a:hover {
+    background: #ebedf0;
+}
+
+
 
 /* ЗАГОЛОВКИ */
 h1 {
@@ -111,7 +257,7 @@ h1 {
 .btn-submit {
     width: 100%;
     padding: 12px;
-    background-color: rgb(255, 123, 0); 
+    background-color: #0052cc; 
     color: white;
     border: none;
     border-radius: 6px;
@@ -121,7 +267,7 @@ h1 {
 }
 
 .btn-submit:hover {
-    background-color: rgb(220, 100, 0);
+    background-color: #0052cc;
 }
 
 .form-footer {
@@ -135,11 +281,38 @@ h1 {
   text-align: center;
 }
 
+.center-content {
+  text-align: center;
+}
+
 
 img{
   display: block;
   margin-left: auto;
   margin-right: auto;
+}
+.center-content{
+    flex: content;
+    /* padding-top:; */
+}
+
+#logout-button{
+    flex: content;
+
+    width: 120px;
+    padding: 12px;
+    margin-top: auto;
+    background-color: #0052cc;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+#logout-button:hover {
+    background-color: #022d6d;
 }
 
 /*ЗАДАЧИ*/
@@ -164,7 +337,7 @@ img{
 #addTaskButton{
     width: 320px;
     padding: 12px;
-    background-color: rgb(255, 123, 0);
+    background-color: #0052cc;
     color: white;
     border: none;
     border-radius: 6px;
@@ -174,11 +347,11 @@ img{
 }
 
 #addTaskButton:hover {
-    background-color: rgb(255, 156, 63);
+    background-color: #022d6d;
 }
 
 #addTaskButton:active {
-    background-color: rgb(250, 187, 127);
+    background-color: #347be6;
     /* border-radius: 50px; */
     padding: 5px 15px;
 }
@@ -230,6 +403,10 @@ img{
     font-family: Arial, Helvetica, sans-serif;
 }
 
+#taskTitle:active{
+    border-color: #0052cc;
+}
+
 /* Стили для Канбан-доски */
 .kanban-board {
     display: flex;
@@ -258,8 +435,11 @@ img{
 .task-list {
     list-style: none;
     padding: 0;
+    min-height: 100px; /* Даже если список пуст, он будет высотой 100px */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
-
 /* Стиль карточки задачи */
 .task-card {
     display: flex;
@@ -271,6 +451,7 @@ img{
     padding: 15px;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border-left: 5px solid;
 }
 
 .task-actions {
@@ -296,6 +477,195 @@ img{
 }
 
 /* Цвета по приоритету */
-.priority-Высокий { border-left-color: red; }
-.priority-Средний { border-left-color: orange; }
-.priority-Низкий { border-left-color: green; }
+.priority-Высокий { border-left-color: rgba(206, 0, 0, 0.67); }
+.priority-Средний { border-left-color: rgba(251, 180, 1, 0.67); }
+.priority-Низкий { border-left-color: rgba(24, 235, 24, 0.67); }
+
+
+/* БЕКЛОГИ */
+#btn-create {
+    width: 100%;
+    padding: 12px;
+    /* background-color: #d8dadd;  */
+    color: rgb(161, 157, 157);
+    border: none;
+    border-radius: 3px;
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+#backlogMaker {
+    margin: 10px 5px 10px 10px;
+    padding: 1px 20px 10px 0px;
+    background-color: rgb(238, 238, 238);
+    border-radius: 10px;
+}
+
+.backlog-h1{
+    /* margin: 25px 15px 0px 20px; */
+    padding: 0px 0px 0px 40px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#backlogMaked{
+    margin: 10px 0px 10px 15px;
+}
+
+.bl-createform-btn {
+    width: 47%;
+    padding: 12px;
+    /* background-color: #d8dadd;  */
+    color: rgb(90, 88, 88);
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.3s;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* ОКНО ПОДТВЕРЖДЕНИЯ СОЗДАНИЯ */
+#backlogFormDialog p{
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 20px;
+}
+
+.taskPriorityLabel label{ 
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.taskPriorityLabel{
+    margin: 10px 0px 5px 0px;
+    padding: 10px 0px 0px 0px;
+}
+
+#backlogNameInput{
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#backlogDescriptInput{
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#myDialog {
+    border-radius: 10px;
+    border: none;
+}
+
+
+
+
+
+/* СПРИНТЫ */
+#sprintStarter {
+    margin: 10px 5px 10px 10px;
+    background-color: rgb(238, 238, 238);
+    border-radius: 10px;
+}
+
+.sprint-h1 {
+    padding: 10px 0px 0px 40px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#btn-start {
+    width: 100%;
+    padding: 12px;
+    /* background-color: #d8dadd;  */
+    color: rgb(161, 157, 157);
+    border: none;
+    /* border-radius: 3px; */
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+/* Дизайн карточек задач в бэклоге */
+.bl-list .task-card {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    gap: 20px;
+}
+
+.bl-list .task-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 30px;
+    flex: 1;
+}
+
+.bl-list .task-content strong {
+    font-size: 16px;
+    flex: 1;
+}
+
+.bl-list .task-content p {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+    color: #666;
+}
+
+.bl-list .task-content select {
+    padding: 4px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #f9f9f9;
+}
+
+.bl-list .task-actions {
+    border-top: none;
+    padding-top: 0;
+    width: auto;
+    display: flex;
+    align-items: center;
+}
+
+.bl-list .task-actions button {
+    flex: none;
+    padding: 8px 15px;
+    width: auto;
+}
+
+.sprint-createform-btn{
+    width: 47%;
+    padding: 12px;
+    /* background-color: #d8dadd;  */
+    color: rgb(90, 88, 88);
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.3s;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.sprint-cancelform-btn{
+    width: 47%;
+    padding: 12px;
+    /* background-color: #d8dadd;  */
+    color: rgb(90, 88, 88);
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.3s;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.create-project-btn {
+    border-top: 1px solid #ddd;
+    font-weight: bold;
+    color: #0052cc !important;
+}

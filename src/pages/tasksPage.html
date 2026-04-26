@@ -2,58 +2,87 @@
 <html lang="ru">
     <head>
         <meta charset="UTF-8">
+        <title>Доска</title>
         <link rel="stylesheet" href="../styles/styles.css">
     </head>
     <body>
-        <header>
-            <nav class="navbar">
-                <ul class="nav-links">
-                    <li><a href="homePage.html">Главная</a></li>
-                    <li><a href="tasksPage.html" class="active">Задачи</a></li>
-                    <li class="auth-link"><a href="profilePage.html">Профиль</a></li>
+        <div class="app-container">
+            <aside class="sidebar" id="sidebar">
+                <div class="logo">
+                    <img src="../assets/logotype.png" alt="logo">
+                    <span>Task system</span>
+                </div>
+
+                <div class="custom-dropdown">
+                    <div class="dropdown-trigger" onclick="toggleDropdown()">
+                        <span>Проекты</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="dropdown-menu" id="projectMenu">
+                        <!-- Контейнер ТОЛЬКО для списка проектов из базы -->
+                        <div id="dynamic-project-list"></div>
+                        <!-- Статичная кнопка, которую мы никогда не трогаем -->
+                        <a href="#" class="create-project-btn" >+ Создать проект</a>
+                    </div>
+                </div>
+
+                <div id="projectList"></div> 
+
+                <ul class="side-links">
+                    <li><a href="profilePage.html">Профиль</a></li>
                 </ul>
-            </nav>
-        </header>
-        <main>
-            <h1 class="task-h1">Задачи</h1>
-            <form id="taskForm"> 
-                <div id="taskNameInput">
-                    <input type="text" id="taskTitle" placeholder="Название задачи" required>
-                    <select id="taskPriority">
-                        <option value="Высокий">Высокий</option>
-                        <option value="Средний" selected>Средний</option>
-                        <option value="Низкий">Низкий</option>
-                    </select>
-                    <button type="submit" id="addTaskButton">Добавить задачу</button>
-                </div> 
+            </aside>
+            <div class="main-content">
+                <header class="navbar">
+                    <ul class="nav-links">
+                        <li><a href="tasksPage.html">Доска</a></li>
+                        <li><a href="backlogsPage.html">Бэклог</a></li>
+                    </ul>
+                </header>
+                <main>
+                    <h1 class="task-h1">Задачи</h1>
+                    
+
+                    <div class="kanban-board">
+                        <div class="kanban-column" id="col-todo">
+                            <h2>Нужно сделать</h2>
+                            <ul class="task-list"></ul>
+                        </div>
+                        <div class="kanban-column" id="col-progress">
+                            <h2>В работе</h2>
+                            <ul class="task-list"></ul>
+                        </div>
+                        <div class="kanban-column" id="col-testing">
+                            <h2>Тестируется</h2>
+                            <ul class="task-list"></ul>
+                        </div>
+                        <div class="kanban-column" id="col-done">
+                            <h2>Готово</h2>
+                            <ul class="task-list"></ul>
+                        </div>
+                    </div>
+
+                    
+                    
+                    <!-- <ul id="taskList"></ul> -->
+                </main>
+                <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+                <script src="../scripts/tasks.js"></script>
+            </div>
+        </div>
+         <script src="../scripts/sidebar.js"></script>
+         <script src="/scripts/dropdown_menu.js"></script>
+         <dialog id="projectDialog">
+            <form id="projectFormDialog">
+                <p>Создать новый проект:</p>
+                <input type="text" id="projectName" placeholder="Название проекта" required>
+                <input type="text" id="projectDesc" placeholder="Описание">
+                <div>
+                    <button type="submit">Создать</button>
+                    <button type="button" onclick="document.getElementById('projectDialog').close()">Отмена</button>
+                </div>
             </form>
-            
-            <!-- место для сообщений об ошибках/успехе -->
-            <div class="msgdiv">
-                <span id="message"></span>
-            </div>
-            
-
-            <div class="kanban-board">
-                <div class="kanban-column" id="col-todo">
-                    <h2>Нужно сделать</h2>
-                    <ul class="task-list"></ul>
-                </div>
-                <div class="kanban-column" id="col-progress">
-                    <h2>В работе</h2>
-                    <ul class="task-list"></ul>
-                </div>
-                <div class="kanban-column" id="col-done">
-                    <h2>Готово</h2>
-                    <ul class="task-list"></ul>
-                </div>
-            </div>
-
-            
-            
-            <!-- <ul id="taskList"></ul> -->
-        </main>
-        <script src="../scripts/tasks.js"></script>
+        </dialog>
     </body>
 
 </html>
