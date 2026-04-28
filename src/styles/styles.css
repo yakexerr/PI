@@ -584,7 +584,6 @@ img{
     transition: background 0.3s;
 }
 
-/* Дизайн карточек задач в бэклоге */
 .bl-list .task-card, .sprint-task-list .task-card {
     flex-direction: row;
     align-items: center;
@@ -668,4 +667,15 @@ img{
     border-top: 1px solid #ddd;
     font-weight: bold;
     color: #0052cc !important;
+}
+
+.edit-icon {
+    cursor: pointer;
+    color: #a7a5a561;
+    font-size: 0.9em;
+    margin-left: 8px;
+    transition: color 0.2s;
+}
+.edit-icon:hover {
+    color: #4e4c4cac;
 }

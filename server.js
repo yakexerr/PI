@@ -106,6 +106,24 @@ app.post('/api/backlogs/order', (req, res) => {
     }
 });
 
+// Обновить название задачи
+app.patch('/api/tasks/:id/title', (req, res) => {
+    try {
+        const { id } = req.params;
+        const { title } = req.body;
+        const stmt = db.prepare("UPDATE tasks SET title = ? WHERE id = ?");
+        const info = stmt.run(title, id);
+
+        if (info.changes > 0) {
+            res.json({ message: 'Название задачи обновлено', id, title });
+        } else {
+            res.status(404).json({ error: 'Задача не найдена' });
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // Обновить статус задачи
 app.put('/api/backlogs/:id/status', (req, res) => {
     try {
@@ -359,6 +377,19 @@ app.post('/api/projects', (req, res) => {
         // dbActions нужно будет дополнить методом createProject в db.js
         const info = dbActions.createProject(name, description);
         res.json({ id: info.lastInsertRowid, name });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.patch('/api/projects/:id', (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name } = req.body;
+        const stmt = db.prepare("UPDATE projects SET name = ? WHERE id = ?");
+        const info = stmt.run(name, id);
+        if (info.changes > 0) res.json({ message: 'Проект обновлен' });
+        else res.status(404).json({ error: 'Проект не найден' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

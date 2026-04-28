@@ -83,6 +83,19 @@
                 </div>
             </form>
         </dialog>
+
+        <dialog id="renameDialog" style="border-radius: 10px; border: none; padding: 20px; width: 320px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <form id="renameForm">
+                <p style="font-weight: bold; margin-top: 0; margin-bottom: 15px; color: #333;" id="renameDialogTitle">Переименовать</p>
+                <input type="hidden" id="renameItemId">
+                <input type="hidden" id="renameItemType">
+                <input type="text" id="renameInput" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between;">
+                    <button type="submit" class="sprint-createform-btn">Сохранить</button>
+                    <button type="button" class="sprint-cancelform-btn" onclick="document.getElementById('renameDialog').close()">Отмена</button>
+                </div>
+            </form>
+        </dialog>
     </body>
 
 </html>

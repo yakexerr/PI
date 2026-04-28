@@ -208,6 +208,7 @@ function createTaskElement(t) {
     li.dataset.taskId = t.id;
     
     const priorities = ['Высокий', 'Средний', 'Низкий'];
+    const safeTitle = t.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
     const priorityDropdown = `
         <select onchange="updateTaskPriority(${t.id}, this.value)">
             ${priorities.map(p => `<option value="${p}" ${t.priority === p ? 'selected' : ''}>${p}</option>`).join('')}
@@ -216,7 +217,7 @@ function createTaskElement(t) {
 
     li.innerHTML = `
         <div class="task-content">
-            <strong>${t.title}</strong>
+            <strong>${t.title} <span class="edit-icon" onclick="openRenameDialog(${t.id}, 'task', '${safeTitle}')" title="Переименовать задачу">&#9998;</span></strong>
             <p>Приоритет: ${priorityDropdown}</p>
         </div>
         <div class="task-actions">

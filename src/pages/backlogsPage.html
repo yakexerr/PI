@@ -19,9 +19,8 @@
                         <span class="arrow">▼</span>
                     </div>
                     <div class="dropdown-menu" id="projectMenu">
-                        <!-- Контейнер ТОЛЬКО для списка проектов из базы -->
                         <div id="dynamic-project-list"></div>
-                        <!-- Статичная кнопка, которую мы никогда не трогаем -->
+
                         <a href="#" class="create-project-btn" >+ Создать проект</a>
                     </div>
                 </div>
@@ -85,11 +84,12 @@
                     </dialog>
 
                     <!-- Всплывающее окно для создания спринта -->
-                    <dialog id="sprintDialog">
+                    <dialog id="sprintDialog" style="border-radius: 10px; border: none; padding: 20px; width: 320px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
                         <form id="sprintFormDialog">
-                            <p>Введите название спринта:</p>
-                            <input type="text" id="sprintNameInput" placeholder="Название спринта" required>
-                            <div>
+                            <p style="font-weight: bold; margin-top: 0; margin-bottom: 15px; color: #333;">Введите название спринта:</p>
+                            <input type="text" id="sprintNameInput" placeholder="Название спринта" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; margin-bottom: 5px;">
+                            
+                            <div style="display: flex; justify-content: space-between;">
                                 <button type="submit" class="sprint-createform-btn">Создать</button>
                                 <button type="button" class="sprint-cancelform-btn" onclick="document.getElementById('sprintDialog').close()">Отмена</button>
                             </div>
@@ -97,7 +97,7 @@
                     </dialog>
 
                     <!-- Всплывающее окно для старта спринта -->
-                    <dialog id="startSprintDialog" style="border-radius: 10px; border: none; padding: 20px; max-width: 400px;">
+                    <dialog id="startSprintDialog" style="border-radius: 10px; border: none; padding: 20px; width: 600px;">
                         <form id="startSprintFormDialog">
                             <h2 style="margin-top: 0;">Начать спринт</h2>
                             <input type="hidden" id="startSprintId">
@@ -130,7 +130,7 @@
 
                             <div class="input-group">
                                 <label>Цель спринта</label>
-                                <textarea id="startSprintDescription" rows="3" placeholder="Опишите цель..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; margin-top: 5px; font-family: Arial;"></textarea>
+                                <textarea id="startSprintDescription" rows="3" placeholder="Опишите цель..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; margin-top: 5px; font-family: Arial; resize: none;"></textarea>
                             </div>
 
                             <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end;">
@@ -141,7 +141,7 @@
                     </dialog>
 
                     <!-- Всплывающее окно для завершения спринта -->
-                    <dialog id="completeSprintDialog">
+                    <dialog id="completeSprintDialog" style="border-radius: 10px; border: none; padding: 20px; width: 320px;">
                         <form id="completeSprintFormDialog">
                             <p>Завершить этот спринт?</p>
                             <p style="font-size: 14px; color: #666;">Незавершенные задачи будут возвращены в бэклог.</p>
@@ -168,6 +168,19 @@
                 <div>
                     <button type="submit">Создать</button>
                     <button type="button" onclick="document.getElementById('projectDialog').close()">Отмена</button>
+                </div>
+            </form>
+        </dialog>
+
+        <dialog id="renameDialog" style="border-radius: 10px; border: none; padding: 20px; width: 320px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+            <form id="renameForm">
+                <p style="font-weight: bold; margin-top: 0; margin-bottom: 15px; color: #333;" id="renameDialogTitle">Переименовать</p>
+                <input type="hidden" id="renameItemId">
+                <input type="hidden" id="renameItemType">
+                <input type="text" id="renameInput" required style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between;">
+                    <button type="submit" class="sprint-createform-btn">Сохранить</button>
+                    <button type="button" class="sprint-cancelform-btn" onclick="document.getElementById('renameDialog').close()">Отмена</button>
                 </div>
             </form>
         </dialog>
