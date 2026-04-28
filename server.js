@@ -1,6 +1,7 @@
 import express from 'express';
 import {db, dbActions } from './db.js';
-import path from 'path';
+// экспорт app для тестов
+export { app }; 
 
 const app = express();
 const PORT = 3000;
@@ -399,3 +400,9 @@ app.patch('/api/projects/:id', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Сервер запущен: http://localhost:${PORT}`);
 })
+
+if (process.env.NODE_ENV !== 'test') {
+    app.listen(PORT, () => {
+        console.log(`Сервер запущен: http://localhost:${PORT}`);
+    });
+}
