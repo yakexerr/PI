@@ -585,7 +585,7 @@ img{
 }
 
 /* Дизайн карточек задач в бэклоге */
-.bl-list .task-card {
+.bl-list .task-card, .sprint-task-list .task-card {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
@@ -593,7 +593,7 @@ img{
     gap: 20px;
 }
 
-.bl-list .task-content {
+.bl-list .task-content, .sprint-task-list .task-content {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -601,12 +601,12 @@ img{
     flex: 1;
 }
 
-.bl-list .task-content strong {
+.bl-list .task-content strong, .sprint-task-list .task-content strong {
     font-size: 16px;
     flex: 1;
 }
 
-.bl-list .task-content p {
+.bl-list .task-content p, .sprint-task-list .task-content p {
     margin: 0;
     display: flex;
     align-items: center;
@@ -615,14 +615,14 @@ img{
     color: #666;
 }
 
-.bl-list .task-content select {
+.bl-list .task-content select, .sprint-task-list .task-content select {
     padding: 4px 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
     background: #f9f9f9;
 }
 
-.bl-list .task-actions {
+.bl-list .task-actions, .sprint-task-list .task-actions {
     border-top: none;
     padding-top: 0;
     width: auto;
@@ -630,7 +630,7 @@ img{
     align-items: center;
 }
 
-.bl-list .task-actions button {
+.bl-list .task-actions button, .sprint-task-list .task-actions button {
     flex: none;
     padding: 8px 15px;
     width: auto;

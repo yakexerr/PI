@@ -277,7 +277,7 @@ app.post('/api/tasks/order', (req, res) => {
 // СПРИНТЫ
 app.get('/api/sprints', (req, res) => {
     try {
-        const projectId = 1;
+        const projectId = req.query.projectId || 1;
         const sprints = dbActions.getSprintsByProject(projectId);
         
         // для каждого спринта получаем его задачи

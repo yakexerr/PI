@@ -39,11 +39,12 @@ sprintFormDialog.onsubmit = async (e) => {
     const name = input.value.trim();
     if (!name) return;
 
+    const currentProjectId = localStorage.getItem('currentProjectId') || 1;
     try {
         const res = await fetch('/api/sprints', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ name: name, project_id: 1 })
+            body: JSON.stringify({ name: name, project_id: currentProjectId })
         });
         if (res.ok) {
             input.value = '';
@@ -167,6 +168,7 @@ setTimeout(() => {
 
 async function createBacklog(name, description, priority) {
     const messageSpan = document.getElementById('message');
+    const currentProjectId = localStorage.getItem('currentProjectId') || 1;
     try {
         const response = await fetch('/api/backlogs', {
             method: 'POST',
@@ -174,7 +176,7 @@ async function createBacklog(name, description, priority) {
             body: JSON.stringify({ 
                 title: name,
                 description: description, 
-                project_id: 1, 
+                project_id: currentProjectId, 
                 priority: priority,
                 status: 'TODO'
             })
@@ -218,7 +220,7 @@ function createTaskElement(t) {
             <p>Приоритет: ${priorityDropdown}</p>
         </div>
         <div class="task-actions">
-            <button type="button" class="btn-delete" onclick="if(confirm('Удалить задачу?')) deleteBacklog(${t.id})">Удалить</button>
+            <button type="button" class="btn-delete" onclick="if(confirm('Удалить задачу?')) deleteTask(${t.id})">Удалить</button>
         </div>
     `;
     return li;
@@ -232,7 +234,7 @@ async function loadBacklog() {
         const tasks = await resTasks.json();
 
         // Получаем все спринты
-        const resSprints = await fetch('/api/sprints');
+        const resSprints = await fetch(`/api/sprints?projectId=${projectId}`);
         let sprints = [];
         if (resSprints.ok) {
             sprints = await resSprints.json();
@@ -293,7 +295,7 @@ async function loadBacklog() {
                     </div>
                     <div>${btnAction}</div>
                 </div>
-                <ul class="bl-list sprint-task-list" data-sprint-id="${sprint.id}" style="min-height: 50px; background: #fff; padding: 10px; border: 1px dashed #ccc;">
+                <ul class="sprint-task-list" data-sprint-id="${sprint.id}" style="min-height: 50px; background: #fff; padding: 10px; border: 1px dashed #ccc;">
                 </ul>
             `;
             
@@ -337,7 +339,7 @@ async function updateTaskPriority(taskId, priority) {
 
 function initSortable() {
     // Инициализируем Sortable.js для бэклога и всех спринтов
-    const lists = document.querySelectorAll('.bl-list');
+    const lists = document.querySelectorAll('.bl-list, .sprint-task-list');
     lists.forEach(list => {
         // Проверяем, не инициализирован ли он уже
         if(list.sortableInstance) list.sortableInstance.destroy();
@@ -374,7 +376,7 @@ function initSortable() {
     });
 }
 
-async function deleteBacklog(taskId) {
+async function deleteTask(taskId) {
     try {
         // Сначала пытаемся удалить из спринтов, хотя CASCADE или отдельный вызов удалит
         await fetch(`/api/sprints/tasks/${taskId}`, { method: 'DELETE' });
