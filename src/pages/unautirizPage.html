@@ -2,24 +2,43 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Просмотр</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task System — Добро пожаловать</title>
     <link rel="stylesheet" href="../styles/styles.css">
 </head>
 <body>
+
     <header>
         <nav class="navbar">
             <ul class="nav-links">
                 <li><a href="unautirizPage.html">Главная</a></li>
-                
                 <li class="auth-link"><a href="authPage.html">Вход</a></li>
                 <li class="reg-link"><a href="registrationPage.html">Регистрация</a></li>
             </ul>
         </nav>
     </header>
 
-    <main>
-        <h1>Главная</h1>
+    <main class="hero-section">
+        <div class="promo-card">
+            
+            <img src="../assets/logotype.png" alt="Task System Logo" class="logo-img">
+            
+            <h1 class="main-title">Task System</h1>
+            
+            <p class="description">
+                Простой и удобный инструмент для управления вашими проектами. 
+                Создавайте задачи, планируйте спринты и достигайте целей быстрее 
+                вместе с нашей системой.
+            </p>
+            
+            <div class="cta-buttons">
+                <a href="authPage.html" class="btn btn-primary">Войти</a>
+                <a href="registrationPage.html" class="btn btn-secondary">Регистрация</a>
+            </div>
+
+        </div>
     </main>
-     <script src="../scripts/sidebar.js"></script>
+
+    <script src="../scripts/sidebar.js"></script>
 </body>
 </html>
