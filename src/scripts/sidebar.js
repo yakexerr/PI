@@ -2,44 +2,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Логика выпадающего меню проектов ---
     async function initSidebar() {
-        const projectListContainer = document.getElementById('dynamic-project-list');
-        if (!projectListContainer) return;
+    const projectListContainer = document.getElementById('dynamic-project-list');
+    if (!projectListContainer) return;
 
-        // 1. Берем логин текущего пользователя
-        const userLogin = localStorage.getItem('userLogin');
-        if (!userLogin) return; // Если не вошли, проекты не грузим
+    // 1. Берем логин! Без него сервер ничего не отдаст.
+    const userLogin = localStorage.getItem('userLogin');
+    
+    // Если юзер не залогинен, то и проекты искать не для кого
+    if (!userLogin) {
+        console.warn("Логин не найден в localStorage");
+        return;
+    }
 
-        // 2. Убираем жесткую привязку к ID 1. Если проекта нет - пусть будет null.
-        const currentProjectId = localStorage.getItem('currentProjectId');
-        let currentProjectName = "";
+    try {
+        // 2. ОБЯЗАТЕЛЬНО добавляем ?username=...
+        const res = await fetch(`/api/projects?username=${userLogin}`);
+        if (!res.ok) throw new Error("Ошибка запроса");
+        
+        const projects = await res.json();
+        projectListContainer.innerHTML = ''; 
 
-        try {
-            // 3. ОБЯЗАТЕЛЬНО передаем username серверу
-            const res = await fetch(`/api/projects?username=${userLogin}`);
-            if (!res.ok) return;
-            
-            const projects = await res.json();
-            projectListContainer.innerHTML = '';
+        // Если проектов нет, можно вывести маленькую надпись
+        if (projects.length === 0) {
+            projectListContainer.innerHTML = '<span style="padding: 10px; font-size: 12px; color: #888;">Нет доступных проектов</span>';
+        }
 
-            projects.forEach(p => {
-                // Если этот проект сейчас выбран, запоминаем имя для заголовка
-                if (p.id == currentProjectId) {
-                    currentProjectName = p.name;
-                }
-
-                const a = document.createElement('a');
-                a.textContent = p.name;
-                a.href = "tasksPage.html";
-                a.className = "project-item";
-                
-                a.onclick = (e) => {
-                    e.preventDefault();
-                    localStorage.setItem('currentProjectId', p.id);
-                    window.location.href = 'tasksPage.html';
-                };
-                projectListContainer.appendChild(a);
-            });
-
+        projects.forEach(p => {
+            const a = document.createElement('a');
+            a.textContent = p.name;
+            a.href = "tasksPage.html";
+            a.className = "project-item";
+            a.onclick = (e) => {
+                e.preventDefault();
+                localStorage.setItem('currentProjectId', p.id);
+                window.location.href = 'tasksPage.html';
+            };
+            projectListContainer.appendChild(a);
+        });
             // 4. Логика заголовка H1
             const h1 = document.querySelector('.task-h1');
             if (h1) {
@@ -74,36 +73,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Вешаем слушатель на форму, ТОЛЬКО если она есть
     if (projectFormDialog) {
-    projectFormDialog.onsubmit = async (e) => {
-        e.preventDefault();
-        const name = document.getElementById('projectName').value;
-        const desc = document.getElementById('projectDesc').value;
-        
-        // Достаем ID пользователя из хранилища
-        const userId = localStorage.getItem('userId');
+        projectFormDialog.onsubmit = async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('projectName').value;
+            const desc = document.getElementById('projectDesc').value;
+            
+            // ДОСТАЕМ ID ТЕКУЩЕГО ЮЗЕРА
+            const userId = localStorage.getItem('userId');
 
-        try {
-            const userLogin = localStorage.getItem('userLogin'); // Берем логин из памяти
+            try {
+                const response = await fetch('/api/projects', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    // ОТПРАВЛЯЕМ userId ВМЕСТЕ С ИМЕНЕМ ПРОЕКТА
+                    body: JSON.stringify({ 
+                        name: name, 
+                        description: desc, 
+                        userId: userId 
+                    })
+                });
 
-            const response = await fetch('/api/projects', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ 
-                    name: name, 
-                    description: desc, 
-                    username: userLogin // ОТПРАВЛЯЕМ ЛОГИН
-                })
-            });
-            if (response.ok) {
-                const newProject = await response.json();
-                localStorage.setItem('currentProjectId', newProject.id);
-                window.location.href = 'tasksPage.html'; 
+                if (response.ok) {
+                    const newProject = await response.json();
+                    localStorage.setItem('currentProjectId', newProject.id);
+                    window.location.href = 'tasksPage.html'; 
+                }
+            } catch (err) {
+                console.error("Ошибка сети:", err);
             }
-        } catch (err) {
-            console.error("Ошибка сети:", err);
-        }
-    };
-}
+        };
+    }
 
     // Обработчик формы переименования
     const renameForm = document.getElementById('renameForm');

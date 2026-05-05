@@ -400,16 +400,22 @@ app.put('/api/sprints/:id/status', (req, res) => {
 // Получить список всех проектов
 app.get('/api/projects', (req, res) => {
     try {
-        const username = req.query.username; // Получаем, кто спрашивает
-        
-        // Тянем только те проекты, где этот юзер есть в участниках
-        const rows = db.prepare(`
-            SELECT p.* FROM projects p
-            JOIN project_members pm ON p.id = pm.project_id
-            JOIN users u ON pm.user_id = u.id
-            WHERE u.username = ?
-        `).all(username);
-        
+        const { username } = req.query;
+        if (!username) return res.json([]);
+
+        let rows;
+        if (username === 'admin') {
+            // Админ видит ВООБЩЕ ВСЕ проекты системы
+            rows = db.prepare("SELECT * FROM projects").all();
+        } else {
+            // Остальные видят только свои
+            rows = db.prepare(`
+                SELECT p.* FROM projects p
+                JOIN project_members pm ON p.id = pm.project_id
+                JOIN users u ON pm.user_id = u.id
+                WHERE u.username = ?
+            `).all(username);
+        }
         res.json(rows);
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -417,14 +423,18 @@ app.get('/api/projects', (req, res) => {
 
 app.post('/api/projects', (req, res) => {
     try {
-        const { name, description, userId } = req.body; // Получаем ID создателя
+        // Сервер получает userId из запроса фронтенда
+        const { name, description, userId } = req.body; 
+        
+        // 1. Создаем сам проект
         const info = dbActions.createProject(name, description);
         const projectId = info.lastInsertRowid;
 
-        // Если ID пользователя передан, сразу добавляем его в участники проекта
+        // 2. Если ID юзера пришел, привязываем его к проекту
         if (userId) {
-            db.prepare("INSERT OR IGNORE INTO project_members (project_id, user_id) VALUES (?, ?)")
+            db.prepare("INSERT INTO project_members (project_id, user_id) VALUES (?, ?)")
               .run(projectId, userId);
+            console.log(`Проект ${projectId} привязан к юзеру ${userId}`);
         }
 
         res.json({ id: projectId, name });
