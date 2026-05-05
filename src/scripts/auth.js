@@ -27,8 +27,10 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
     .then(async response => {
         const data = await response.json();
         if (response.ok) {
+            localStorage.setItem('userId', data.userId);
             localStorage.setItem('userName', data.userName); // Для приветствия 
             localStorage.setItem('userLogin', username);     // Сохраняем логин для запросов в БД
+            localStorage.setItem('userRole', data.userRole); // сохраняем роль
             // Теперь сервер присылает userName
             localStorage.setItem('userName', data.userName); 
             

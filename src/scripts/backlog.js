@@ -209,8 +209,13 @@ function createTaskElement(t) {
     
     const priorities = ['Высокий', 'Средний', 'Низкий'];
     const safeTitle = t.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    
+    // ПРОВЕРКА: Если ты девелопер или тестер — селект будет выключен (disabled)
+    const role = localStorage.getItem('userRole');
+    const isEmployee = (role === 'DEVELOPER' || role === 'TESTER');
+
     const priorityDropdown = `
-        <select onchange="updateTaskPriority(${t.id}, this.value)">
+        <select onchange="updateTaskPriority(${t.id}, this.value)" ${isEmployee ? 'disabled' : ''}>
             ${priorities.map(p => `<option value="${p}" ${t.priority === p ? 'selected' : ''}>${p}</option>`).join('')}
         </select>
     `;
@@ -221,7 +226,7 @@ function createTaskElement(t) {
             <p>Приоритет: ${priorityDropdown}</p>
         </div>
         <div class="task-actions">
-            <button type="button" class="btn-delete" onclick="if(confirm('Удалить задачу?')) deleteTask(${t.id})">Удалить</button>
+            <button type="button" class="btn-delete" onclick="if(confirm('Удалить задачу?')) deleteBacklog(${t.id})">Удалить</button>
         </div>
     `;
     return li;
@@ -229,12 +234,21 @@ function createTaskElement(t) {
 
 async function loadBacklog() {
     try {
-        // Получаем все задачи
-        const projectId = localStorage.getItem('currentProjectId') || 1;
+        const projectId = localStorage.getItem('currentProjectId');
+        
+        // Если проект не выбран в сайдбаре, очищаем списки и выходим
+        if (!projectId) {
+            console.log("Проект не выбран");
+            document.getElementById('sprintsContainer').innerHTML = '<p style="padding: 20px; color: #666;">Выберите проект в меню слева</p>';
+            document.querySelector('#blShow .bl-list').innerHTML = "";
+            return;
+        }
+
+        // Получаем задачи именно этого проекта
         const resTasks = await fetch(`/api/backlogs?projectId=${projectId}`);
         const tasks = await resTasks.json();
 
-        // Получаем все спринты
+        // Получаем спринты именно этого проекта
         const resSprints = await fetch(`/api/sprints?projectId=${projectId}`);
         let sprints = [];
         if (resSprints.ok) {
@@ -320,6 +334,7 @@ async function loadBacklog() {
         });
 
         initSortable();
+        applyPermissions();
     } catch (err) {
         console.error("Ошибка загрузки задач:", err);
     }
@@ -398,3 +413,19 @@ async function deleteTask(taskId) {
 }
 
 loadBacklog();
+
+
+function applyPermissions() {
+    const role = localStorage.getItem('userRole');
+    
+    if (role === 'DEVELOPER' || role === 'TESTER') {
+        if (document.getElementById('taskForm')) document.getElementById('taskForm').style.display = 'none';
+        if (document.getElementById('btn-create')) document.getElementById('btn-create').style.display = 'none';
+        if (document.getElementById('btn-start')) document.getElementById('btn-start').style.display = 'none';
+        
+        document.querySelectorAll('.btn-delete').forEach(btn => btn.style.display = 'none');
+        document.querySelectorAll('.edit-icon').forEach(el => el.style.display = 'none'); // Скрываем правку имени
+        document.querySelectorAll('button[onclick*="startSprint"]').forEach(btn => btn.style.display = 'none');
+        document.querySelectorAll('button[onclick*="completeSprint"]').forEach(btn => btn.style.display = 'none');
+    }
+}

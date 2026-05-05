@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Управление командой</title>
+    <link rel="stylesheet" href="../styles/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Твой стандартный сайдбар -->
+        <aside class="sidebar" id="sidebar">
+            <div class="logo">
+                <img src="../assets/logotype.png" alt="logo">
+                <span>Task system</span>
+            </div>
+            <div class="custom-dropdown">
+                <div class="dropdown-trigger" onclick="toggleDropdown()">
+                    <span>Проекты</span> <span class="arrow">▼</span>
+                </div>
+                <div class="dropdown-menu" id="projectMenu">
+                    <div id="dynamic-project-list"></div>
+                    <a href="#" class="create-project-btn">+ Создать проект</a>
+                </div>
+            </div>
+            <ul class="side-links">
+                <li><a href="tasksPage.html">Доска</a></li>
+                <li><a href="adminPage.html" class="active" id="admin-link">Команда</a></li>
+                <li><a href="profilePage.html">Профиль</a></li>
+            </ul>
+        </aside>
+
+        <div class="main-content">
+            <main>
+                <h1>Управление командой</h1>
+                <div class="auth-card" style="max-width: 600px; margin: 0 auto;">
+                    <h3>Добавить нового сотрудника</h3>
+                    <form id="createEmployeeForm">
+                        <div class="input-group">
+                            <label>Имя</label>
+                            <input type="text" id="empName" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Фамилия</label>
+                            <input type="text" id="empLastname" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Логин (Email)</label>
+                            <input type="text" id="empLogin" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Пароль</label>
+                            <input type="password" id="empPassword" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Роль в системе</label>
+                            <select id="empRole" style="width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #ddd;">
+                                <option value="DEVELOPER">Разработчик (DEVELOPER)</option>
+                                <option value="TESTER">Тестировщик (TESTER)</option>
+                                <option value="MANAGER">Менеджер (MANAGER)</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-submit">Создать аккаунт</button>
+                        <div id="admin-message" style="margin-top: 10px;"></div>
+                    </form>
+
+                    <hr style="margin: 40px 0; border: none; border-top: 1px solid #ddd;">
+
+                    <h3>Список пользователей (Восстановление доступа)</h3>
+                    <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #ddd; overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; text-align: left; font-family: Arial;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #eee;">
+                                    <th style="padding: 10px;">Имя Фамилия</th>
+                                    <th style="padding: 10px;">Логин (Email)</th>
+                                    <th style="padding: 10px;">Пароль</th>
+                                    <th style="padding: 10px;">Роль</th>
+                                    <th style="padding: 10px;">Действие</th>
+                                </tr>
+                            </thead>
+                            <tbody id="user-list-tbody">
+                                <!-- Сюда JS вставит строки -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="../scripts/dropdown_menu.js"></script>
+    <script src="../scripts/sidebar.js"></script>
+    <script src="../scripts/admin.js"></script>
+</body>
+</html>

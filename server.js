@@ -18,38 +18,46 @@ app.get('/', (req, res) => {
 app.post('/register', (req, res) => {
     try {
         const user = req.body;
-
-        // проверяем занят ли юзернейм
-        const existingUser = dbActions.getUserByName(user.username)
+        const existingUser = dbActions.getUserByName(user.username);
         if (existingUser) {
-            // код ошибки 409 - конфликт запроса с текущим состоянием сервера(т.е. запрос корректен, но нарушает целостность данных)
-            return res.status(409).json({ error: 'Пользователь с таким именем уже существует!' });
+            return res.status(409).json({ error: 'Пользователь уже существует!' });
         }
 
-        dbActions.saveUser(user);
-        res.status(201).json({ message: 'Успех', userName: user.name });
+        // dbActions.saveUser должен возвращать результат выполнения (с lastInsertRowid)
+        const info = dbActions.saveUser(user); 
+        
+        res.status(201).json({ 
+            message: 'Успех', 
+            userId: info.lastInsertRowid, // ОТДАЕМ ID
+            userName: user.name,
+            userRole: 'MANAGER' // По умолчанию для новых
+        });
     } catch (e) {
-        // код ошибки 400 - сервер не может обработать запрос из-за его некорректного синтаксиса, ошибки пользователя
-
-        res.status(400).json({ error: 'Ошибка: ' + e.message });
+        res.status(400).json({ error: e.message });
     }
 });
 
 
 // АВТОРИЗАЦИЯ
+// server.js
+
+// 1. Исправляем логин
 app.post('/login', (req, res) => {
     const {username, password} = req.body;
     const user = dbActions.findUser(username, password); 
 
     if (user) {
-        res.json({ message: 'Успех', userName: user.name });
+        res.json({ 
+            message: 'Успех', 
+            userId: user.id, 
+            userName: user.name, 
+            userLogin: user.username,
+            userRole: user.role
+        });
     } else {
-        // 401 - Unauthorized - если пользователь вводит неверный логин и пароль или их нет в БД
         res.status(401).json({message: 'Неверный логин или пароль'})
     }
 });
-
-
 
 
 // --- ПРОФИЛЬ ---
@@ -63,11 +71,19 @@ app.get('/api/user-info', (req, res) => {
 // --- ЗАДАЧИ ---
 // Отдать список задач
 app.get('/api/backlogs', (req, res) => {
-    const projectId = req.query.projectId || 1;
-    const rows = db.prepare("SELECT * FROM tasks WHERE project_id = ? ORDER BY position, id DESC").all(projectId);
-    res.json(rows);
-});
+    try {
+        const { projectId } = req.query;
+        
+        // Если ID проекта не пришел, возвращаем пустой список (безопасность!)
+        if (!projectId) return res.json([]);
 
+        const rows = db.prepare("SELECT * FROM tasks WHERE project_id = ? ORDER BY position, id DESC")
+                       .all(projectId);
+        res.json(rows);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
 // Принять новую задачу
 app.post('/api/backlogs', (req, res) => {
     try {
@@ -204,10 +220,10 @@ app.patch('/api/backlogs/:id/priority', (req, res) => {
 // Отдать задачи только для активного спринта
 app.get('/api/tasks', (req, res) => {
     try {
-        const projectId = req.query.projectId || 1;
-        // Сначала пробуем взять задачи спринта
+        const projectId = req.query.projectId; // УБРАЛИ || 1
+        if (!projectId) return res.json([]); // Если проекта нет в запросе — отдаем пустоту
+
         let tasks = dbActions.getTasksForActiveSprint(projectId);
-        // Если спринта нет, берем все задачи проекта
         if (!tasks || tasks.length === 0) {
             tasks = dbActions.getTasksByProject(projectId);
         }
@@ -234,18 +250,28 @@ app.post('/api/tasks', (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
+// server.js
+
 app.patch('/api/tasks/:id', (req, res) => {
     try {
         const { id } = req.params;
         const { status } = req.body;
-        const stmt = db.prepare("UPDATE tasks SET status = ? WHERE id = ?");
-        const info = stmt.run(status, id);
+        
+        // Имитируем получение роли из сессии/заголовка
+        // В реальном проекте мы бы сделали запрос к БД или проверили JWT
+        const userRole = req.headers['x-user-role']; 
 
-        if (info.changes > 0) {
-            res.json({ message: 'Статус обновлен', id, status });
-        } else {
-            res.status(404).json({ error: 'Задача не найдена' });
+        if (userRole === 'DEVELOPER' && status === 'DONE') {
+            return res.status(403).json({ error: "Разработчику запрещено закрывать задачи" });
         }
+        
+        if (userRole === 'TESTER' && status === 'IN_PROGRESS') {
+            return res.status(403).json({ error: "Тестировщику запрещено брать задачи в работу" });
+        }
+
+        const stmt = db.prepare("UPDATE tasks SET status = ? WHERE id = ?");
+        stmt.run(status, id);
+        res.json({ message: 'Ок' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -264,18 +290,26 @@ app.patch('/api/tasks/:id/priority', (req, res) => {
     }
 });
 
+
+// Защита удаления (только для Менеджера, Админа или Соло)
 app.delete('/api/tasks/:id', (req, res) => {
     try {
         const { id } = req.params;
+        // Мы можем передавать роль в заголовках для проверки
+        const userRole = req.headers['x-user-role']; 
+
+        if (userRole === 'DEVELOPER' || userRole === 'TESTER') {
+            return res.status(403).json({ error: "Доступ запрещен: недостаточно прав" });
+        }
+
         dbActions.removeTaskFromSprint(id);
-        const stmt = db.prepare("DELETE FROM tasks WHERE id = ?");
-        const info = stmt.run(id);
-        if (info.changes > 0) res.json({ message: 'Удалено' });
-        else res.status(404).json({ error: 'Не найдено' });
+        db.prepare("DELETE FROM tasks WHERE id = ?").run(id);
+        res.json({ message: 'Удалено' });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
+
 
 app.post('/api/tasks/order', (req, res) => {
     try {
@@ -366,7 +400,16 @@ app.put('/api/sprints/:id/status', (req, res) => {
 // Получить список всех проектов
 app.get('/api/projects', (req, res) => {
     try {
-        const rows = db.prepare("SELECT * FROM projects").all();
+        const username = req.query.username; // Получаем, кто спрашивает
+        
+        // Тянем только те проекты, где этот юзер есть в участниках
+        const rows = db.prepare(`
+            SELECT p.* FROM projects p
+            JOIN project_members pm ON p.id = pm.project_id
+            JOIN users u ON pm.user_id = u.id
+            WHERE u.username = ?
+        `).all(username);
+        
         res.json(rows);
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
@@ -374,10 +417,17 @@ app.get('/api/projects', (req, res) => {
 
 app.post('/api/projects', (req, res) => {
     try {
-        const { name, description } = req.body;
-        // dbActions нужно будет дополнить методом createProject в db.js
+        const { name, description, userId } = req.body; // Получаем ID создателя
         const info = dbActions.createProject(name, description);
-        res.json({ id: info.lastInsertRowid, name });
+        const projectId = info.lastInsertRowid;
+
+        // Если ID пользователя передан, сразу добавляем его в участники проекта
+        if (userId) {
+            db.prepare("INSERT OR IGNORE INTO project_members (project_id, user_id) VALUES (?, ?)")
+              .run(projectId, userId);
+        }
+
+        res.json({ id: projectId, name });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -406,3 +456,58 @@ if (process.env.NODE_ENV !== 'test') {
         console.log(`Сервер запущен: http://localhost:${PORT}`);
     });
 }
+
+// --- АДМИН-ПАНЕЛЬ ---
+
+// Получить список всех пользователей
+app.get('/api/admin/users', (req, res) => {
+    try {
+        // Показываем только DEVELOPER и TESTER
+        // Это скроет всех "самостоятельных" менеджеров и других админов
+        const rows = db.prepare(`
+            SELECT * FROM users 
+            WHERE role IN ('DEVELOPER', 'TESTER') 
+            ORDER BY id DESC
+        `).all();
+        
+        res.json(rows);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Создать нового сотрудника (логика Менеджера/Админа)
+app.post('/api/admin/create-user', (req, res) => {
+    try {
+        const { name, lastname, username, password, role } = req.body;
+        
+        // Проверяем, не занят ли логин
+        const existing = dbActions.getUserByName(username);
+        if (existing) {
+            return res.status(400).json({ error: "Пользователь с таким логином уже есть" });
+        }
+
+        const info = dbActions.createEmployee({ name, lastname, username, password, role });
+        res.json({ message: "Успешно создан", id: info.lastInsertRowid });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/projects/:id/members', (req, res) => {
+    try {
+        const projectId = req.params.id;
+        const { memberUsername } = req.body;
+
+        const user = db.prepare("SELECT id FROM users WHERE username = ?").get(memberUsername);
+        if (!user) return res.status(404).json({ error: "Пользователь не найден" });
+
+        // Добавляем в таблицу связей
+        db.prepare("INSERT OR IGNORE INTO project_members (project_id, user_id) VALUES (?, ?)")
+          .run(projectId, user.id);
+
+        res.json({ message: "Участник добавлен" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});

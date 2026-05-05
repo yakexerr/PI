@@ -38,10 +38,30 @@
 
 .side-links {
     display: flex;
+    flex-direction: column; /* Устанавливаем вертикальное направление */
     list-style: none;
-    margin: 0;
     padding: 0;
-    flex-grow: 1; /* Чтобы список занял всё место */
+    margin: 20px 0 0 0;
+    gap: 5px; /* Небольшой отступ между кнопками */
+}
+
+.side-links li {
+    width: 100%;
+}
+
+.side-links a {
+    display: block; /* Ссылка занимает всю ширину */
+    padding: 10px 15px;
+    text-decoration: none;
+    color: #444;
+    font-weight: 500;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.side-links a:hover {
+    background-color: #ebedf0;
+    color: #0052cc;
 }
 
 /* Ссылки */

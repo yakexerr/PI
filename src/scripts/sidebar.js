@@ -5,17 +5,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const projectListContainer = document.getElementById('dynamic-project-list');
         if (!projectListContainer) return;
 
-        const currentProjectId = localStorage.getItem('currentProjectId') || 1;
-        let currentProjectName = "Проект";
+        // 1. Берем логин текущего пользователя
+        const userLogin = localStorage.getItem('userLogin');
+        if (!userLogin) return; // Если не вошли, проекты не грузим
+
+        // 2. Убираем жесткую привязку к ID 1. Если проекта нет - пусть будет null.
+        const currentProjectId = localStorage.getItem('currentProjectId');
+        let currentProjectName = "";
 
         try {
-            const res = await fetch('/api/projects');
+            // 3. ОБЯЗАТЕЛЬНО передаем username серверу
+            const res = await fetch(`/api/projects?username=${userLogin}`);
             if (!res.ok) return;
             
             const projects = await res.json();
             projectListContainer.innerHTML = '';
 
             projects.forEach(p => {
+                // Если этот проект сейчас выбран, запоминаем имя для заголовка
                 if (p.id == currentProjectId) {
                     currentProjectName = p.name;
                 }
@@ -33,13 +40,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 projectListContainer.appendChild(a);
             });
 
-            // Выводим название проекта в заголовок H1
+            // 4. Логика заголовка H1
             const h1 = document.querySelector('.task-h1');
             if (h1) {
                 let baseText = h1.dataset.baseText || h1.textContent;
-                h1.dataset.baseText = baseText; // Сохраняем оригинальный текст
-                const safeName = currentProjectName.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-                h1.innerHTML = `${baseText} – ${currentProjectName} <span class="edit-icon" onclick="openRenameDialog(${currentProjectId}, 'project', '${safeName}')" title="Переименовать проект">&#9998;</span>`;
+                h1.dataset.baseText = baseText; 
+
+                if (currentProjectName) {
+                    const safeName = currentProjectName.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                    h1.innerHTML = `${baseText} – ${currentProjectName} <span class="edit-icon" onclick="openRenameDialog(${currentProjectId}, 'project', '${safeName}')" title="Переименовать проект">&#9998;</span>`;
+                } else {
+                    h1.textContent = baseText + " (выберите проект)";
+                }
             }
 
         } catch (err) {
@@ -62,38 +74,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Вешаем слушатель на форму, ТОЛЬКО если она есть
     if (projectFormDialog) {
-        projectFormDialog.onsubmit = async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('projectName').value;
-            const desc = document.getElementById('projectDesc').value;
+    projectFormDialog.onsubmit = async (e) => {
+        e.preventDefault();
+        const name = document.getElementById('projectName').value;
+        const desc = document.getElementById('projectDesc').value;
+        
+        // Достаем ID пользователя из хранилища
+        const userId = localStorage.getItem('userId');
 
-            try {
-                const response = await fetch('/api/projects', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ name, description: desc })
-                });
+        try {
+            const userLogin = localStorage.getItem('userLogin'); // Берем логин из памяти
 
-                if (response.ok) {
-                    // 1. Получаем ответ от сервера
-                    const newProject = await response.json();
-                    
-                    // 2. Вытаскиваем ID нового проекта
-                    const newProjectId = newProject.id; 
-
-                    // 3. Устанавливаем его как ТЕКУЩИЙ
-                    localStorage.setItem('currentProjectId', newProjectId);
-
-                    // 4. Перенаправляем на доску задач, чтобы сразу видеть пустую доску нового проекта
-                    window.location.href = 'tasksPage.html'; 
-                } else {
-                    alert("Ошибка при создании проекта");
-                }
-            } catch (err) {
-                console.error("Ошибка сети:", err);
+            const response = await fetch('/api/projects', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ 
+                    name: name, 
+                    description: desc, 
+                    username: userLogin // ОТПРАВЛЯЕМ ЛОГИН
+                })
+            });
+            if (response.ok) {
+                const newProject = await response.json();
+                localStorage.setItem('currentProjectId', newProject.id);
+                window.location.href = 'tasksPage.html'; 
             }
-        };
-    }
+        } catch (err) {
+            console.error("Ошибка сети:", err);
+        }
+    };
+}
 
     // Обработчик формы переименования
     const renameForm = document.getElementById('renameForm');
@@ -135,6 +145,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Запускаем инициализацию сайдбара
     initSidebar();
+    const role = localStorage.getItem('userRole');
+    const adminLink = document.getElementById('admin-link');
+
+    if (adminLink) {
+        // Теперь вкладка "Команда" видна ТОЛЬКО пользователю с ролью ADMIN
+        if (role === 'ADMIN') {
+            adminLink.parentElement.style.display = 'block'; 
+        } else {
+            adminLink.parentElement.style.display = 'none'; 
+        }
+    }
 });
 
 // Глобальная функция для открытия окна переименования
@@ -152,3 +173,4 @@ window.openRenameDialog = function(id, type, currentName) {
     
     dialog.showModal();
 };
+

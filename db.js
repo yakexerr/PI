@@ -10,9 +10,19 @@ db.exec(`
     name TEXT NOT NULL,
     lastname TEXT NOT NULL,
     birthDate DATE NOT NULL,
-    role TEXT DEFAULT 'DEVELOPER'
+    role TEXT DEFAULT 'MANAGER'
     )
     `);
+
+db.exec(`
+    CREATE TABLE IF NOT EXISTS project_members (
+        project_id INTEGER,
+        user_id INTEGER,
+        PRIMARY KEY (project_id, user_id),
+        FOREIGN KEY (project_id) REFERENCES projects(id),
+        FOREIGN KEY (user_id) REFERENCES users(id)
+    )
+`);
 
 
 // Таблица проектов
@@ -90,7 +100,7 @@ const userCols = db.prepare("PRAGMA table_info(users)").all();
 const roleColumn = userCols.find(c => c.name === 'role');
 
 if (!roleColumn) {
-    db.exec("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'DEVELOPER'");
+    db.exec("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'MANAGER'");
 }
 
 const columns = db.prepare("PRAGMA table_info(tasks)").all();
@@ -114,6 +124,12 @@ CREATE TABLE IF NOT EXISTS comments (
     FOREIGN KEY (author_id) REFERENCES users (id)
 )
 `);
+
+/**
+ * Это объект-синглтон - по сути готовый экземпляр с методами 
+ * Аналог UserRepository из ТЗл
+ * 
+ */
 
 // это объект-синглтон - по сути готовый экземпляр с методами (похоже на статический класс)
 export const dbActions = {
@@ -262,10 +278,32 @@ export const dbActions = {
         return stmt.run(name, description);
     },
 
+    createEmployee: (data) => {
+        const insert = db.prepare(`
+            INSERT INTO users (username, password, name, lastname, birthDate, role)
+            VALUES (?, ?, ?, ?, '2000-01-01', ?)
+        `);
+        return insert.run(data.username, data.password, data.name, data.lastname, data.role);
+    },
+
+    // Получение роли пользователя для проверки на сервере
+    getUserRole: (username) => {
+        const stmt = db.prepare('SELECT role FROM users WHERE username = ?');
+        const user = stmt.get(username);
+        return user ? user.role : null;
+    },
+
 
 }
 
 // тестовый проект
 // TODO: удалить потом
 
-db.exec("INSERT OR IGNORE INTO projects (id, name) VALUES (1, 'Тестовый проект')");
+// db.exec("INSERT OR IGNORE INTO projects (id, name) VALUES (1, 'Тестовый проект')");
+
+db.exec(`
+    INSERT OR IGNORE INTO users (username, password, name, lastname, birthDate, role)
+    VALUES ('admin', 'admin', 'Администратор', 'Системы', '2000-01-01', 'ADMIN')
+`);
+
+console.log("Проверка наличия администратора завершена.");

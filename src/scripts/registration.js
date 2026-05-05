@@ -40,6 +40,7 @@ document.getElementById('regForm').addEventListener('submit', function(e) {
     .then(async response => {
         if (response.ok) {
             const data = await response.json();
+            localStorage.setItem('userId', data.userId);
             localStorage.setItem('userName', data.userName); // Для приветствия 
             localStorage.setItem('userLogin', username);     // Сохраняем логин для запросов в БД
             // Сохраняем имя (в сервере мы его назвали userName)

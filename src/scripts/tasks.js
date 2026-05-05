@@ -33,6 +33,11 @@ async function updateTaskPriority(taskId, priority) {
 
 async function loadTasks() {
     const projectId = localStorage.getItem('currentProjectId') || 1;
+    if (!projectId) {
+        console.log("Проект не выбран");
+        // Можно скрыть доску или написать "Выберите проект"
+        return; 
+    }
     try {
         const res = await fetch(`/api/tasks?projectId=${projectId}`);
         const tasks = await res.json();
@@ -97,6 +102,7 @@ async function loadTasks() {
             }
         });
         initSortable();
+        applyPermissions();
     } catch (err) {
         console.error("Ошибка загрузки задач:", err);
     }
@@ -124,6 +130,8 @@ loadTasks();
 
 function initSortable() {
     const lists = document.querySelectorAll('.task-list');
+    const role = localStorage.getItem('userRole'); // Получаем роль
+
     lists.forEach(list => {
         if(list.sortableInstance) list.sortableInstance.destroy();
         
@@ -132,27 +140,29 @@ function initSortable() {
             animation: 150,
             onEnd: function (evt) {
                 const taskId = evt.item.dataset.taskId;
+                const parentId = evt.to.parentElement.id;
+                const role = localStorage.getItem('userRole');
                 
-                // Если перетащили В ДРУГУЮ колонку
-                if (evt.from !== evt.to) {
-                    const parentId = evt.to.parentElement.id;
-                    let newStatus = '';
-                    if (parentId === 'col-todo') newStatus = 'TODO';
-                    else if (parentId === 'col-progress') newStatus = 'IN_PROGRESS'; // Явно прописываем
-                    else if (parentId === 'col-testing') newStatus = 'TESTING';
-                    else if (parentId === 'col-done') newStatus = 'DONE';
+                let newStatus = '';
+                if (parentId === 'col-todo') newStatus = 'TODO';
+                else if (parentId === 'col-progress') newStatus = 'IN_PROGRESS';
+                else if (parentId === 'col-testing') newStatus = 'TESTING';
+                else if (parentId === 'col-done') newStatus = 'DONE';
 
+                if (role === 'DEVELOPER' && newStatus === 'DONE') {
+                    alert("Разработчик не может переводить задачи в 'Готово'. Это должен сделать Тестировщик.");
+                    loadTasks(); // Сбрасываем карточку на старое место (перерисовываем доску)
+                    return; 
+                }
+
+                // ЗАПРЕТ: Тестер не может кидать в "Нужно сделать" (TODO)
+                if (role === 'TESTER' && newStatus === 'TODO') {
+                    alert("Тестировщик не может возвращать задачи в начало (Нужно сделать)");
+                    loadTasks(); return;
+                }
+
+                if (evt.from !== evt.to) {
                     updateTaskStatus(taskId, newStatus);
-                } 
-                // Если перетащили ВНУТРИ одной колонки (сортировка)
-                else {
-                    const projectId = localStorage.getItem('currentProjectId') || 1;
-                    const taskIds = Array.from(evt.to.children).map(item => item.dataset.taskId);
-                    fetch(`/api/tasks?projectId=${projectId}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ order: taskIds })
-                    }).catch(err => console.error("Ошибка при обновлении порядка:", err));
                 }
             }
         });
@@ -196,3 +206,25 @@ document.getElementById('taskForm').addEventListener('submit', async function(e)
         console.error('Ошибка сети:', err);
     }
 });
+
+function applyPermissions() {
+    const role = localStorage.getItem('userRole');
+    
+    if (role === 'DEVELOPER' || role === 'TESTER') {
+        const taskForm = document.getElementById('taskForm');
+        if (taskForm) taskForm.style.display = 'none';
+        document.querySelectorAll('.btn-delete').forEach(btn => btn.style.display = 'none');
+        document.querySelectorAll('.edit-icon').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.task-content select').forEach(sel => sel.disabled = true);
+    }
+
+    if (role === 'TESTER') {
+        // ТЕСТЕРУ нельзя нажимать кнопку "Назад" в ПЕРВЫЙ столбец (TODO)
+        document.querySelectorAll('button[onclick*="\'TODO\'"]').forEach(btn => btn.style.display = 'none');
+    }
+
+    if (role === 'DEVELOPER') {
+        // РАЗРАБОТЧИКУ нельзя нажимать кнопку "Готово" (DONE)
+        document.querySelectorAll('button[onclick*="\'DONE\'"]').forEach(btn => btn.style.display = 'none');
+    }
+}
