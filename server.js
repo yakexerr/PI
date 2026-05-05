@@ -403,21 +403,19 @@ app.get('/api/projects', (req, res) => {
         const { username } = req.query;
         if (!username) return res.json([]);
 
-        let rows;
-        if (username === 'admin') {
-            // Админ видит ВООБЩЕ ВСЕ проекты системы
-            rows = db.prepare("SELECT * FROM projects").all();
-        } else {
-            // Остальные видят только свои
-            rows = db.prepare(`
-                SELECT p.* FROM projects p
-                JOIN project_members pm ON p.id = pm.project_id
-                JOIN users u ON pm.user_id = u.id
-                WHERE u.username = ?
-            `).all(username);
-        }
+        // Единый запрос для всех (и для админа, и для юзеров)
+        // Выбираем только те проекты, где текущий username есть в таблице участников
+        const rows = db.prepare(`
+            SELECT p.* FROM projects p
+            JOIN project_members pm ON p.id = pm.project_id
+            JOIN users u ON pm.user_id = u.id
+            WHERE u.username = ?
+        `).all(username);
+        
         res.json(rows);
-    } catch (err) { res.status(500).json({ error: err.message }); }
+    } catch (err) { 
+        res.status(500).json({ error: err.message }); 
+    }
 });
 
 
