@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // -- для аватарки
-    const avatarCount = 5; // Укажи здесь, сколько у тебя картинок в папке assets
+    const avatarCount = 12; // Укажи здесь, сколько у тебя картинок в папке assets
     const avatarIndex = Math.floor(Math.random() * avatarCount) + 1; // если каждый раз при обновлении
     // const avatarIndex = (userId % avatarCount) + 1; // если не каждый раз
     const avatarImg = document.getElementById('p-avatar');
