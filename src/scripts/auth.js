@@ -4,8 +4,6 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
     // собираем данные один раз в переменные
     const username = document.getElementById('username').value;
     const p1 = document.getElementById('password').value;
-
-
     const messageSpan = document.getElementById('message');
 
     // очищаем старые сообщения
@@ -16,7 +14,6 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
         username: username,
         password: p1
     };
-
 
     // отправка данных
     fetch('/login', {

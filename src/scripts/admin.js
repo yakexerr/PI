@@ -14,32 +14,56 @@ document.addEventListener('DOMContentLoaded', () => {
     // Функция загрузки списка (теперь внутри, чтобы видеть элементы страницы)
     async function loadUsersList() {
         try {
-            const res = await fetch('/api/admin/users');
-            const users = await res.json();
+            const currentProjId = localStorage.getItem('currentProjectId');
+            const userLogin = localStorage.getItem('userLogin');
+
+            // Получаем всех сотрудников
+            const resAll = await fetch('/api/admin/users');
+            const allUsers = await resAll.json();
+
+            // Получаем ID тех, кто уже в текущем проекте
+            let memberIds = [];
+            if (currentProjId) {
+                const resMembers = await fetch(`/api/projects/${currentProjId}/members-ids`);
+                if (resMembers.ok) memberIds = await resMembers.json();
+                
+                // Заодно обновим название проекта в заголовке
+                const resProj = await fetch(`/api/projects?username=${userLogin}`);
+                const projects = await resProj.json();
+                const currentProj = projects.find(p => p.id == currentProjId);
+                if (currentProj) {
+                    document.getElementById('current-project-display').textContent = currentProj.name;
+                }
+            }
+
             const tbody = document.getElementById('user-list-tbody');
-            
             if (!tbody) return;
 
-            // Получаем текущий выбранный проект, чтобы знать, куда добавлять
-            const currentProjId = localStorage.getItem('currentProjectId');
+            tbody.innerHTML = allUsers.map(u => {
+                // Проверяем, есть ли ID этого юзера в списке участников проекта
+                const isMember = memberIds.includes(u.id);
 
-            tbody.innerHTML = users.map(u => `
-                <tr style="border-bottom: 1px solid #eee;">
-                    <td style="padding: 10px;">${u.name} ${u.lastname}</td>
-                    <td style="padding: 10px;"><strong>${u.username}</strong></td>
-                    <td style="padding: 10px;"><code style="background: #eee; padding: 2px 4px;">${u.password}</code></td>
-                    <td style="padding: 10px;">${u.role}</td>
-                    <td style="padding: 10px;">
-                        <button class="btn-submit" 
-                                style="width: auto; padding: 5px 10px; font-size: 11px;" 
-                                onclick="inviteToProject('${u.username}')">
-                            + В проект
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
+                return `
+                    <tr style="border-bottom: 1px solid #eee; background: ${isMember ? '#f9f9f9' : 'white'}">
+                        <td style="padding: 10px;">${u.name} ${u.lastname}</td>
+                        <td style="padding: 10px;"><strong>${u.username}</strong></td>
+                        <td style="padding: 10px;"><code style="background: #eee; padding: 2px 4px;">${u.password}</code></td>
+                        <td style="padding: 10px;">${u.role}</td>
+                        <td style="padding: 10px;">
+                            ${isMember 
+                                ? `<span style="color: green; font-size: 12px; font-weight: bold;">✔ В проекте</span>`
+                                : `<button class="btn-submit" 
+                                        style="width: auto; padding: 5px 10px; font-size: 11px;" 
+                                        onclick="inviteToProject('${u.username}')">
+                                    + Добавить
+                                </button>`
+                            }
+                        </td>
+                    </tr>
+                `;
+            }).join('');
         } catch (err) {
-            console.error("Ошибка загрузки списка юзеров:", err);
+            console.error("Ошибка загрузки:", err);
         }
     }
 
@@ -101,6 +125,7 @@ window.inviteToProject = async (targetUsername) => {
 
         if (response.ok) {
             alert(`Пользователь ${targetUsername} успешно добавлен в проект!`);
+            loadUsersList();
         } else {
             const err = await response.json();
             alert("Ошибка: " + err.error);

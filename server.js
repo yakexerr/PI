@@ -18,6 +18,7 @@ app.post('/register', (req, res) => {
         const user = req.body;
         const existingUser = dbActions.getUserByName(user.username);
         if (existingUser) {
+            // 409 - сервер не может что-то выполнить из-за конфликта данных с текущим состоянием
             return res.status(409).json({ error: 'Пользователь уже существует!' });
         }
 
@@ -30,6 +31,7 @@ app.post('/register', (req, res) => {
             userRole: 'MANAGER' // По умолчанию для новых
         });
     } catch (e) {
+        // 400 - сервер не может обработать из-за синтаксической ошибки
         res.status(400).json({ error: e.message });
     }
 });
@@ -50,6 +52,7 @@ app.post('/login', (req, res) => {
             userRole: user.role
         });
     } else {
+        // 401 - у сервера нет подтверждения личности
         res.status(401).json({message: 'Неверный логин или пароль'})
     }
 });
@@ -216,43 +219,22 @@ app.patch('/api/backlogs/:id/priority', (req, res) => {
 app.get('/api/tasks', (req, res) => {
     try {
         const projectId = req.query.projectId;
-        if (!projectId) return res.json([]); // Если проекта нет в запросе то отдаем пустоту
-
+        if (!projectId) return res.json([]);
         let tasks = dbActions.getTasksForActiveSprint(projectId);
-        if (!tasks || tasks.length === 0) {
-            tasks = dbActions.getTasksByProject(projectId);
-        }
         res.json(tasks);
+        // 500 - универсаьный ответ, сервер столкнулся с непредвиденной ситуацией
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
 
-app.post('/api/tasks', (req, res) => {
-    try {
-        const { title, project_id, priority } = req.body;
-        const pId = project_id || 1;
-        const posStmt = db.prepare("SELECT MAX(position) as max_pos FROM tasks");
-        const maxPos = posStmt.get().max_pos || 0;
-        const newPos = maxPos + 1;
-        const stmt = db.prepare("INSERT INTO tasks (title, project_id, status, priority, position) VALUES (?, ?, 'TODO', ?, ?)");
-        const info = stmt.run(title, pId, priority, newPos);
-        
-        const activeSprint = db.prepare("SELECT id FROM sprints WHERE project_id = ? AND status = 'ACTIVE'").get(pId);
-        if (activeSprint) {
-            dbActions.addTaskToSprint(activeSprint.id, info.lastInsertRowid);
-        }
-        res.json({ id: info.lastInsertRowid, title, status: 'TODO', priority, position: newPos });
-    } catch (err) { res.status(500).json({ error: err.message }); }
-});
-
-
+// переход между состояниями
 app.patch('/api/tasks/:id', (req, res) => {
     try {
         const { id } = req.params;
         const { status } = req.body;
         
         // Имитируем получение роли из сессии/заголовка
-        // В реальном проекте мы бы сделали запрос к БД или проверили JWT
+        // В реальном проекте бы сделали запросик к БД или проверили JWT
         const userRole = req.headers['x-user-role']; 
 
         if (userRole === 'DEVELOPER' && status === 'DONE') {
@@ -285,7 +267,7 @@ app.patch('/api/tasks/:id/priority', (req, res) => {
 });
 
 
-// Защита удаления (только для Менеджера, Админа или Соло)
+// Защита удаления (только для Менеджера, Админа)
 app.delete('/api/tasks/:id', (req, res) => {
     try {
         const { id } = req.params;
@@ -304,13 +286,14 @@ app.delete('/api/tasks/:id', (req, res) => {
     }
 });
 
-
+// для обновления позиции и чтобы там задача и осталась
 app.post('/api/tasks/order', (req, res) => {
     try {
         const { order } = req.body;
+        // шаблон запроса, который будет менять значение в колонке
         const updateStmt = db.prepare("UPDATE tasks SET position = ? WHERE id = ?");
-        db.transaction(() => {
-            order.forEach((taskId, index) => {
+        db.transaction(() => { // откатит всё назад при малейшей ошибке
+            order.forEach((taskId, index) => { // проходим по присланному списку и индекс - новая позиция
                 updateStmt.run(index, taskId);
             });
         })();
@@ -453,11 +436,11 @@ app.listen(PORT, () => {
     console.log(`Сервер запущен: http://localhost:${PORT}`);
 })
 
-if (process.env.NODE_ENV !== 'test') {
-    app.listen(PORT, () => {
-        console.log(`Сервер запущен: http://localhost:${PORT}`);
-    });
-}
+// if (process.env.NODE_ENV !== 'test') {
+//     app.listen(PORT, () => {
+//         console.log(`Сервер запущен: http://localhost:${PORT}`);
+//     });
+// }
 
 // --- АДМИН-ПАНЕЛЬ ---
 
@@ -496,6 +479,7 @@ app.post('/api/admin/create-user', (req, res) => {
     }
 });
 
+// добавить в команду
 app.post('/api/projects/:id/members', (req, res) => {
     try {
         const projectId = req.params.id;
@@ -509,6 +493,17 @@ app.post('/api/projects/:id/members', (req, res) => {
           .run(projectId, user.id);
 
         res.json({ message: "Участник добавлен" });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// Получить id всех участников конкретного проекта
+app.get('/api/projects/:id/members-ids', (req, res) => {
+    try {
+        const projectId = req.params.id;
+        const rows = db.prepare("SELECT user_id FROM project_members WHERE project_id = ?").all(projectId);
+        res.json(rows.map(r => r.user_id)); // Возвращаем просто массив ID [1, 5, 8]
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
