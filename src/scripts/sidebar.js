@@ -1,11 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- Логика выпадающего меню проектов ---
     async function initSidebar() {
     const projectListContainer = document.getElementById('dynamic-project-list');
     if (!projectListContainer) return;
 
-    // 1. Берем логин! Без него сервер ничего не отдаст.
     const userLogin = localStorage.getItem('userLogin');
     
     // Если юзер не залогинен, то и проекты искать не для кого
@@ -15,7 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     try {
-        // 2. ОБЯЗАТЕЛЬНО добавляем ?username=...
         const res = await fetch(`/api/projects?username=${userLogin}`);
         if (!res.ok) throw new Error("Ошибка запроса");
         
@@ -39,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             projectListContainer.appendChild(a);
         });
-            // 4. Логика заголовка H1
             const h1 = document.querySelector('.task-h1');
             if (h1) {
                 let baseText = h1.dataset.baseText || h1.textContent;
@@ -58,7 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Логика диалогового окна создания проекта ---
     const createProjectBtn = document.querySelector('.create-project-btn');
     const projectDialog = document.getElementById('projectDialog');
     const projectFormDialog = document.getElementById('projectFormDialog');
@@ -78,14 +73,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const name = document.getElementById('projectName').value;
             const desc = document.getElementById('projectDesc').value;
             
-            // ДОСТАЕМ ID ТЕКУЩЕГО ЮЗЕРА
             const userId = localStorage.getItem('userId');
 
             try {
                 const response = await fetch('/api/projects', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    // ОТПРАВЛЯЕМ userId ВМЕСТЕ С ИМЕНЕМ ПРОЕКТА
                     body: JSON.stringify({ 
                         name: name, 
                         description: desc, 

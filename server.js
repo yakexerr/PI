@@ -1,20 +1,18 @@
 import express from 'express';
 import {db, dbActions } from './db.js';
-// экспорт app для тестов
 export { app }; 
 
 const app = express();
 const PORT = 3000;
 
-app.use(express.json()); // для того чтобы сервер понимал json из fetch запросов
-
-app.use(express.static('src')) // чтобы сервер мог передавать статические файлы вроде css, html и js
-
+app.use(express.json());
+app.use(express.static('src')) 
 app.get('/', (req, res) => {
     res.redirect('/pages/unautirizPage.html');
 });
 
 // РЕГИСТРАЦИЯ
+// это метод register() из класса User
 app.post('/register', (req, res) => {
     try {
         const user = req.body;
@@ -23,12 +21,11 @@ app.post('/register', (req, res) => {
             return res.status(409).json({ error: 'Пользователь уже существует!' });
         }
 
-        // dbActions.saveUser должен возвращать результат выполнения (с lastInsertRowid)
         const info = dbActions.saveUser(user); 
         
         res.status(201).json({ 
             message: 'Успех', 
-            userId: info.lastInsertRowid, // ОТДАЕМ ID
+            userId: info.lastInsertRowid,
             userName: user.name,
             userRole: 'MANAGER' // По умолчанию для новых
         });
@@ -39,9 +36,7 @@ app.post('/register', (req, res) => {
 
 
 // АВТОРИЗАЦИЯ
-// server.js
-
-// 1. Исправляем логин
+// это метод login() из класса User
 app.post('/login', (req, res) => {
     const {username, password} = req.body;
     const user = dbActions.findUser(username, password); 
@@ -74,7 +69,7 @@ app.get('/api/backlogs', (req, res) => {
     try {
         const { projectId } = req.query;
         
-        // Если ID проекта не пришел, возвращаем пустой список (безопасность!)
+        // Если id проекта не пришел, возвращаем пустой список
         if (!projectId) return res.json([]);
 
         const rows = db.prepare("SELECT * FROM tasks WHERE project_id = ? ORDER BY position, id DESC")
@@ -220,8 +215,8 @@ app.patch('/api/backlogs/:id/priority', (req, res) => {
 // Отдать задачи только для активного спринта
 app.get('/api/tasks', (req, res) => {
     try {
-        const projectId = req.query.projectId; // УБРАЛИ || 1
-        if (!projectId) return res.json([]); // Если проекта нет в запросе — отдаем пустоту
+        const projectId = req.query.projectId;
+        if (!projectId) return res.json([]); // Если проекта нет в запросе то отдаем пустоту
 
         let tasks = dbActions.getTasksForActiveSprint(projectId);
         if (!tasks || tasks.length === 0) {
@@ -250,7 +245,6 @@ app.post('/api/tasks', (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-// server.js
 
 app.patch('/api/tasks/:id', (req, res) => {
     try {
@@ -424,11 +418,11 @@ app.post('/api/projects', (req, res) => {
         // Сервер получает userId из запроса фронтенда
         const { name, description, userId } = req.body; 
         
-        // 1. Создаем сам проект
+        // Создаем сам проект
         const info = dbActions.createProject(name, description);
         const projectId = info.lastInsertRowid;
 
-        // 2. Если ID юзера пришел, привязываем его к проекту
+        // Если ID юзера пришел, привязываем его к проекту
         if (userId) {
             db.prepare("INSERT INTO project_members (project_id, user_id) VALUES (?, ?)")
               .run(projectId, userId);

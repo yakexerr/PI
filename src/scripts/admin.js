@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const role = localStorage.getItem('userRole');
 
-    // 1. Защита входа
+    // Защита входа
     if (role !== 'ADMIN' && role !== 'MANAGER') {
         alert("Доступ запрещен!");
         window.location.href = 'tasksPage.html';
@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('createEmployeeForm');
     const msg = document.getElementById('admin-message');
 
-    // 2. Функция загрузки списка (теперь внутри, чтобы видеть элементы страницы)
+    // Функция загрузки списка (теперь внутри, чтобы видеть элементы страницы)
     async function loadUsersList() {
         try {
             const res = await fetch('/api/admin/users');
@@ -43,10 +43,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 3. Сразу загружаем список при открытии страницы
+    // Сразу загружаем список при открытии страницы
     loadUsersList();
 
-    // 4. Обработка формы создания
+    // Обработка формы создания
     if (form) {
         form.onsubmit = async (e) => {
             e.preventDefault();
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     msg.style.color = "green";
                     msg.textContent = "Сотрудник успешно добавлен!";
                     form.reset();
-                    loadUsersList(); // Обновляем таблицу после добавления
+                    loadUsersList(); 
                 } else {
                     msg.style.color = "red";
                     msg.textContent = result.error || "Ошибка создания";

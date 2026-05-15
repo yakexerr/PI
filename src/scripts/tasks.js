@@ -49,7 +49,6 @@ async function loadTasks() {
             'DONE': document.querySelector('#col-done .task-list')
         };
         
-        // очищаем список чтобы при отрисовывании задачи не дублировались (именно в list.innerHTML = "" - типа всё что внутри элемента очсищаем) 
         Object.values(lists).forEach(list => list.innerHTML = "");
 
         tasks.forEach(t => {
@@ -155,7 +154,6 @@ function initSortable() {
                     return; 
                 }
 
-                // ЗАПРЕТ: Тестер не может кидать в "Нужно сделать" (TODO)
                 if (role === 'TESTER' && newStatus === 'TODO') {
                     alert("Тестировщик не может возвращать задачи в начало (Нужно сделать)");
                     loadTasks(); return;
@@ -188,7 +186,7 @@ document.getElementById('taskForm').addEventListener('submit', async function(e)
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ 
                 title: title, 
-                project_id: currentProjectId, // ОТПРАВЛЯЕМ ID ПРОЕКТА
+                project_id: currentProjectId,
                 priority: priority 
             })
         });

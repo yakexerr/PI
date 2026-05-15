@@ -40,13 +40,7 @@ CREATE TABLE IF NOT EXISTS projects (
 `);
 
 // Таблица задач
-/*
-type содержит BUG, FEATURE, IMPROVEMENT
-priority содержит LOW, MEDIUM, HIGH, CRITICAL - нет enum, обходимся текстом
-status содержит TODO, IN_PROGRESS, TESTING, DONE
-assignee_id содержит исполнителя
-reporter_id содержит того, кто создал задачу
-*/
+
 db.exec(`
 CREATE TABLE IF NOT EXISTS tasks (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -126,12 +120,12 @@ CREATE TABLE IF NOT EXISTS comments (
 `);
 
 /**
- * Это объект-синглтон - по сути готовый экземпляр с методами 
- * Аналог UserRepository из ТЗл
+ * Это объект-синглтон - по сути готовый экземпляр с методами. Аналог UserRepository из ТЗ
+ * Аналог UserRepository из ТЗ
  * 
  */
 
-// это объект-синглтон - по сути готовый экземпляр с методами (похоже на статический класс)
+// это объект-синглтон, по сути готовый экземпляр с методами (похоже на статический класс)
 export const dbActions = {
     saveUser: (user) => {
         // prepare типа сохраняет шаблон и благодаря нему мы можем выполнять insert.run
@@ -168,7 +162,6 @@ export const dbActions = {
     return stmt.get(username);
     },
 
-    // (TODO)(yakexerr): должен вернуть пустой список если нет активных задач, добавить на сервере проверку!
     getTasksForActiveSprint: (projectId) => {
         const stmt = db.prepare(`
             SELECT t.* FROM tasks t
@@ -182,7 +175,6 @@ export const dbActions = {
     
     },
 
-    // (TODO)(yakexerr): нужно ли сделать так чтобы отображались просто все задачи на доске если спринта нет? если да то вот:
     getTasksByProject: (projectId) => {
         const stmt = db.prepare('SELECT * FROM tasks WHERE project_id = ?');
         return stmt.all(projectId);

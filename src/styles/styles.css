@@ -1,12 +1,10 @@
-/* Основная часть (справа) */
 .main-content {
-    flex-grow: 1; /* Растягивается на всё оставшееся место */
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
-    min-width: 0; /* Важно, чтобы контент не выталкивал сайдбар */
+    min-width: 0; 
 }
 
-/* Контейнер всего приложения */
 .app-container {
     display: flex;
     min-height: 100vh;
@@ -24,7 +22,7 @@
 
 .logo-link {
     display: flex;
-    align-items: center; /* Логотип центрируем отдельно */
+    align-items: center;
     text-decoration: none;
 }
 
@@ -33,16 +31,16 @@
     list-style: none;
     margin: 0;
     padding: 0;
-    flex-grow: 1; /* Чтобы список занял всё место */
+    flex-grow: 1;
 }
 
 .side-links {
     display: flex;
-    flex-direction: column; /* Устанавливаем вертикальное направление */
+    flex-direction: column; 
     list-style: none;
     padding: 0;
     margin: 20px 0 0 0;
-    gap: 5px; /* Небольшой отступ между кнопками */
+    gap: 5px; 
 }
 
 .side-links li {
@@ -50,7 +48,7 @@
 }
 
 .side-links a {
-    display: block; /* Ссылка занимает всю ширину */
+    display: block;
     padding: 10px 15px;
     text-decoration: none;
     color: #444;
@@ -67,17 +65,16 @@
 /* Ссылки */
 .nav-links a {
     display: flex;
-    align-items: center;   /* Центрируем текст внутри ссылки по вертикали */
+    align-items: center;  
     text-decoration: none;
     font-weight: 500;
-    padding: 0 15px;       /* Паддинг только по бокам */
-    height: 100%;          /* Ссылка теперь высотой 48px */
+    padding: 0 15px; 
+    height: 100%; 
     color: #444;
     transition: all 0.2s ease;
-    border-bottom: 2px solid transparent; /* Запас места для линии */
+    border-bottom: 2px solid transparent; 
 }
 
-/* Общий стиль для ВСЕХ активных вкладок (включая профиль) */
 .nav-links a.active {
     color: #0052cc !important;
     border-bottom: 2px solid #0052cc !important;
@@ -313,7 +310,6 @@ img{
 }
 .center-content{
     flex: content;
-    /* padding-top:; */
 }
 
 #logout-button{
@@ -372,7 +368,6 @@ img{
 
 #addTaskButton:active {
     background-color: #347be6;
-    /* border-radius: 50px; */
     padding: 5px 15px;
 }
 
@@ -406,11 +401,11 @@ img{
 /* Контейнер формы */
 .task-form-container {
     display: flex;
-    flex-direction: column; /* Элементы друг под другом */
-    align-items: center;    /* Центровка по горизонтали */
-    gap: 10px;             /* Отступы между полями */
-    max-width: 400px;       /* Максимальная ширина формы */
-    margin: 20px auto;      /* Центрирует саму форму на странице */
+    flex-direction: column;
+    align-items: center;   
+    gap: 10px;          
+    max-width: 400px;     
+    margin: 20px auto;   
 }
 
 #taskTitle, #taskPriority, #addTaskButton {
@@ -430,7 +425,7 @@ img{
 /* Стили для Канбан-доски */
 .kanban-board {
     display: flex;
-    justify-content: center; /* Центрирует колонки */
+    justify-content: center; 
     gap: 20px;
     padding: 20px;
     align-items: flex-start;
@@ -455,12 +450,12 @@ img{
 .task-list {
     list-style: none;
     padding: 0;
-    min-height: 100px; /* Даже если список пуст, он будет высотой 100px */
+    min-height: 100px; 
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
-/* Стиль карточки задачи */
+
 .task-card {
     display: flex;
     flex-direction: column;
@@ -506,7 +501,6 @@ img{
 #btn-create {
     width: 100%;
     padding: 12px;
-    /* background-color: #d8dadd;  */
     color: rgb(161, 157, 157);
     border: none;
     border-radius: 3px;
@@ -524,7 +518,6 @@ img{
 }
 
 .backlog-h1{
-    /* margin: 25px 15px 0px 20px; */
     padding: 0px 0px 0px 40px;
     font-family: Arial, Helvetica, sans-serif;
 }
@@ -536,7 +529,6 @@ img{
 .bl-createform-btn {
     width: 47%;
     padding: 12px;
-    /* background-color: #d8dadd;  */
     color: rgb(90, 88, 88);
     border: none;
     border-radius: 5px;
@@ -594,10 +586,8 @@ img{
 #btn-start {
     width: 100%;
     padding: 12px;
-    /* background-color: #d8dadd;  */
     color: rgb(161, 157, 157);
     border: none;
-    /* border-radius: 3px; */
     font-size: 14px;
     text-align: center;
     cursor: pointer;
@@ -658,7 +648,6 @@ img{
 .sprint-createform-btn{
     width: 47%;
     padding: 12px;
-    /* background-color: #d8dadd;  */
     color: rgb(90, 88, 88);
     border: none;
     border-radius: 5px;
@@ -672,7 +661,6 @@ img{
 .sprint-cancelform-btn{
     width: 47%;
     padding: 12px;
-    /* background-color: #d8dadd;  */
     color: rgb(90, 88, 88);
     border: none;
     border-radius: 5px;
@@ -707,7 +695,7 @@ img{
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: calc(100vh - 70px); /* Высота экрана минус шапка */
+    min-height: calc(100vh - 70px); 
     padding: 40px;
     background-color: #f4f7f6;
     box-sizing: border-box;
@@ -726,7 +714,6 @@ img{
 .logo-img {
     height: 80px;
     margin-bottom: 24px;
-    /* Убираем глобальный отступ для этой картинки, если он мешает */
     display: block; 
     margin-left: auto;
     margin-right: auto;
